@@ -1,6 +1,7 @@
 [
   {
     "id": 1,
+<<<<<<< HEAD
     "title": "Bienvenue sur le Mini Blog",
     "slug": "bienvenue-mini-blog",
     "content": "Ceci est le premier article de notre mini blog Nuxt 3. Vous pouvez le modifier ou en créer d'autres.",
@@ -27,3 +28,36 @@
     "type": "Tech"
   }
 ]
+=======
+    "title": "Découverte du nouvel iPhone 15",
+    "content": "Aujourd'hui, nous testons le nouvel iPhone 15 et voyons ses fonctionnalités innovantes.",
+    "image": "images/iphone15.jpg",
+    "created_at": "2026-01-14T09:00:00Z",
+    "updated_at": "2026-01-14T09:00:00Z"
+  },
+  {
+    "id": 2,
+    "title": "i'm",
+    "content": "having lunch",
+    "image": "images/gateau_choco.jpg",
+    "created_at": "2026-01-13T15:30:00Z",
+    "updated_at": "2026-01-15T09:52:37.364Z"
+  },
+  {
+    "id": 4,
+    "title": "Top 5 des jeux vidéo en 2026",
+    "content": "Voici notre sélection des 5 meilleurs jeux vidéo à ne pas manquer cette année.",
+    "image": "images/top5_jeux.jpg",
+    "created_at": "2026-01-11T18:45:00Z",
+    "updated_at": "2026-01-11T18:45:00Z"
+  },
+  {
+    "id": 6,
+    "title": "Découverte de samsung galaxy",
+    "content": " Aujourd'hui, nous testons les nouvelles samsung.",
+    "image": "/images/post-1768470088441-213997166.png",
+    "created_at": "2026-01-15T09:41:28.448Z",
+    "updated_at": "2026-01-15T09:41:28.448Z"
+  }
+]
+>>>>>>> origin/routes_vlog
