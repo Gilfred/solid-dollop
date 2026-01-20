@@ -42,7 +42,9 @@ export default defineEventHandler(async (event) => {
         author: author !== undefined ? author : undefined,
         description: description !== undefined ? description : undefined,
         image: image !== undefined ? image : undefined,
-        categorie_id: categorie_id !== undefined ? (categorie_id ? parseInt(categorie_id, 10) : null) : undefined,
+        ...(categorie_id !== undefined ? {
+          category: categorie_id ? { connect: { id: parseInt(categorie_id, 10) } } : { disconnect: true }
+        } : {}),
       },
     });
 
