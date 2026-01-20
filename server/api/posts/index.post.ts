@@ -34,6 +34,13 @@ export default defineEventHandler(async (event) => {
     const description = descriptionEntry.data.toString('utf-8');
     const categoryId = categoryIdEntry ? parseInt(categoryIdEntry.data.toString('utf-8'), 10) : undefined;
 
+    // === Validation du type de fichier (Image) ===
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (imageFile.type && !allowedMimeTypes.includes(imageFile.type)) {
+      setResponseStatus(event, 400);
+      return { error: 'Format d\'image non supporté. Utilisez JPEG, PNG, WEBP ou GIF.' };
+    }
+
     // === Gestion de l'upload de l'image ===
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     const extension = extname(imageFile.filename);
