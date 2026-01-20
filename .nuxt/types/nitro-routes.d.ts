@@ -3,14 +3,23 @@ import type { Serialize, Simplify } from "nitropack/types";
 declare module "nitropack/types" {
   type Awaited<T> = T extends PromiseLike<infer U> ? Awaited<U> : T
   interface InternalApi {
+    '/api/posts/:id': {
+      'delete': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/posts/[id].delete').default>>>>
+      'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/posts/[id].get').default>>>>
+      'put': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/posts/[id].put').default>>>>
+    }
+    '/api/posts': {
+      'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/posts/index.get').default>>>>
+      'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/posts/index.post').default>>>>
+    }
     '/__nuxt_error': {
-      'default': Simplify<Serialize<Awaited<ReturnType<typeof import('../../node_modules/.pnpm/@nuxt+nitro-server@4.2.2_db_40ef9a73304a3d38660ea758d366701a/node_modules/@nuxt/nitro-server/dist/runtime/handlers/renderer').default>>>>
+      'default': Simplify<Serialize<Awaited<ReturnType<typeof import('../../node_modules/.pnpm/@nuxt+nitro-server@4.2.2_db_2bcfbf3b55e43d0d278fbeba7c36268f/node_modules/@nuxt/nitro-server/dist/runtime/handlers/renderer').default>>>>
     }
     '/__nuxt_island/**': {
       'default': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/#internal/nuxt/island-renderer').default>>>>
     }
     '/api/_nuxt_icon/:collection': {
-      'default': Simplify<Serialize<Awaited<ReturnType<typeof import('../../node_modules/.pnpm/@nuxt+icon@2.2.0_magicast@0_293704a83a4714e00d8fbf3bcacc8fd1/node_modules/@nuxt/icon/dist/runtime/server/api').default>>>>
+      'default': Simplify<Serialize<Awaited<ReturnType<typeof import('../../node_modules/.pnpm/@nuxt+icon@2.2.0_magicast@0_4637dbfe837a2ad596d2701defdc4f05/node_modules/@nuxt/icon/dist/runtime/server/api').default>>>>
     }
     '/_ipx/**': {
       'default': Simplify<Serialize<Awaited<ReturnType<typeof import('../../node_modules/.pnpm/@nuxt+image@2.0.0_db0@0.3.4_ioredis@5.9.1_magicast@0.5.1/node_modules/@nuxt/image/dist/runtime/server/routes/_ipx').default>>>>

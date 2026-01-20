@@ -7,6 +7,8 @@ const dataPath = resolve('data', 'post.json');
 // Définir le type pour un article
 export interface Post {
   id: number;
+  slug: string;
+  description: string;
   title: string;
   content: string;
   image: string; // chemin relatif vers l'image, ex: '/images/mon-image.jpg'

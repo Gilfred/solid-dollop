@@ -15,8 +15,11 @@ export default defineNuxtConfig({
   ],
   
   ui: {
-    fonts: false
-  },
+     fonts: false,
+  }
+
+
+  ,
 
   // app était mal placé (manquait une virgule après ui)
   app: {

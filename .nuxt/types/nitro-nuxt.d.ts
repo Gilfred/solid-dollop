@@ -1,7 +1,7 @@
 
 /// <reference path="app.config.d.ts" />
 /// <reference path="runtime-config.d.ts" />
-/// <reference types="C:/Users/LENOVO/Desktop/Nuxt JS/solid-dollop/node_modules/.pnpm/@nuxt+nitro-server@4.2.2_db_40ef9a73304a3d38660ea758d366701a/node_modules/@nuxt/nitro-server/dist/index.mjs" />
+/// <reference types="C:/Users/LENOVO/Desktop/Nuxt JS/solid-dollop/node_modules/.pnpm/@nuxt+nitro-server@4.2.2_db_2bcfbf3b55e43d0d278fbeba7c36268f/node_modules/@nuxt/nitro-server/dist/index.mjs" />
 /// <reference path="../image/providers.d.ts" />
 /// <reference path="nitro-middleware.d.ts" />
 

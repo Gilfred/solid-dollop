@@ -1,5 +1,5 @@
 <template>
-  <NuxtLink :to="`/blog/${post.slug}`" class="block group">
+<NuxtLink :to="`/blog/${post.id}`" class="block group">
     <UCard
       v-if="post"
       class="-p-5 relative overflow-hidden transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg cursor-pointer"
@@ -27,7 +27,7 @@
       <!-- Infos sous l'image -->
       <div>
         <p class="text-xs text-gray-400 mt-2 text-right">
-          {{ post.date }}
+          {{ post.created_at }}
         </p>
 
         <div>
@@ -36,7 +36,7 @@
           </h3>
 
           <p class="text-sm text-gray-600 text-justify">
-            {{ post.description }}
+            {{ post.content }}
           </p>
 
           <p class="text-xs text-gray-400 mt-2 border-t pt-2 border-gray-300">
@@ -49,14 +49,10 @@
 </template>
 
 <script setup lang="ts">
+import type { IPost } from '../../types/post'
+
 defineProps<{
-  post: {
-    title: string
-    slug: string
-    description: string
-    image: string
-    date: string
-    author?: string
-  }
+  post: IPost
 }>()
 </script>
+

@@ -6,8 +6,9 @@
    <UApp>
   <div>
    <NuxtLayout >
+    <NuxtLoadingIndicator />
+  
     <NuxtPage />
-    <AppFooter />   
   </NuxtLayout>
   </div>
   </UApp>
