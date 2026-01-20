@@ -1,34 +1,35 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
-model Categorie {
+model Category {
   id          Int      @id @default(autoincrement())
-  categorie   String
+  name        String   @unique
   description String?
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
   posts       Post[]
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("categories")
 }
 
 model Post {
-  id           Int       @id @default(autoincrement())
-  title        String
-  content      String
-  slug         String    @unique
-  author       String
-  description  String?
-  image        String?
-  categorie_id Int
-  categorie    Categorie @relation(fields: [categorie_id], references: [id])
-  created_at   DateTime  @default(now())
-  updated_at   DateTime  @updatedAt
+  id          Int      @id @default(autoincrement())
+  title       String
+  content     String   @db.Text
+  slug        String   @unique
+  author      String
+  description String?
+  image       String?
+  categoryId  Int      @map("categorie_id")
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("posts")
 }

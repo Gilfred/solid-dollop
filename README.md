@@ -72,36 +72,3 @@ yarn preview
 bun run preview
 ```
 
-## Database (Prisma)
-
-This project uses Prisma with SQLite.
-
-### Setup & Migrations
-
-To initialize the database or apply changes to the schema:
-
-```bash
-npx prisma migrate dev
-```
-
-### Seeding
-
-To populate the database with initial data:
-
-```bash
-npx prisma db seed
-```
-
-### Usage in the project
-
-A singleton Prisma client is available at `server/utils/prisma.ts`. You can use it in your server routes like this:
-
-```typescript
-// server/api/example.get.ts
-export default defineEventHandler(async (event) => {
-  const posts = await prisma.post.findMany()
-  return posts
-})
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.

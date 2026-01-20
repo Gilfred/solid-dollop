@@ -27,3 +27,5 @@ logs
 
 dev.db
 *.db
+
+/app/generated/prisma
