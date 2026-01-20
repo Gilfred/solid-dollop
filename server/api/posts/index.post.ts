@@ -64,7 +64,11 @@ export default defineEventHandler(async (event) => {
         author,
         description,
         image: imageUrl,
-        categorie_id: categoryId && !isNaN(categoryId) ? categoryId : null,
+        ...(categoryId && !isNaN(categoryId) ? {
+          category: {
+            connect: { id: categoryId }
+          }
+        } : {}),
       },
     });
 
