@@ -1,4 +1,3 @@
-
 import { defineEventHandler, setResponseStatus } from 'h3';
 import { prisma } from '../../utils/prisma';
 
@@ -7,10 +6,10 @@ export default defineEventHandler(async (event) => {
     // Récupérer tous les posts avec leurs catégories, triés par date de création (plus récent d'abord)
     const posts = await prisma.post.findMany({
       include: {
-        category: true,
+        category: true, // Jointure avec la table Category: la relation s'appelle 'category' mais le champ est 'categorie_id'
       },
       orderBy: {
-        created_at: 'desc',
+        createdAt: 'desc', // faire un tri décroissant par date de création
       },
     });
 
