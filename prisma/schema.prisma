@@ -1,0 +1,36 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String   @map("categorie")
+  description String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  posts       Post[]
+
+  @@map("categories")
+}
+
+model Post {
+  id           Int      @id @default(autoincrement())
+  title        String
+  content      String   @db.LongText
+  slug         String   @unique
+  author       String
+  description  String?
+  image        String?
+  categorie_id Int?
+  category     Category? @relation(fields: [categorie_id], references: [id])
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+}
