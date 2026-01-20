@@ -1,32 +1,39 @@
-// import { defineEventHandler } from 'h3';
-// import { readPosts } from '../../utils/db';
 
-// export default defineEventHandler(async (event) => {
-//   // Récupérer l'ID depuis les paramètres de la route
-//   const postId = parseInt(event.context.params.id, 10);
+import { defineEventHandler, setResponseStatus } from 'h3';
+import { prisma } from '../../utils/prisma';
 
-//   // Vérifier si l'ID est un nombre valide
-//   if (isNaN(postId)) {
-//     setResponseStatus(event, 400); // Bad Request
-//     return { error: 'L\'ID de l\'article est invalide.' };
-//   }
+export default defineEventHandler(async (event) => {
+  const params = event.context.params;
+  if (!params || !params.id) {
+    setResponseStatus(event, 400);
+    return { error: 'L\'ID de l\'article est requis.' };
+  }
 
-//   try {
-//     const posts = await readPosts();
-//     const post = posts.find((p) => p.id === postId);
+  const postId = parseInt(params.id, 10);
 
-//     if (!post) {
-//       // Si aucun article ne correspond, renvoyer une erreur 404
-//       setResponseStatus(event, 404); // Not Found
-//       return { error: 'Article non trouvé.' };
-//     }
+  if (isNaN(postId)) {
+    setResponseStatus(event, 400);
+    return { error: 'L\'ID de l\'article est invalide.' };
+  }
 
-//     return post;
-//   } catch (error) {
-//     setResponseStatus(event, 500);
-//     return {
-//       error: 'Impossible de lire les données des articles.',
-//       details: error.message,
-//     };
-//   }
-// });
+  try {
+    const post = await prisma.post.findUnique({
+      where: { id: postId },
+      include: { category: true }
+    });
+
+    if (!post) {
+      setResponseStatus(event, 404);
+      return { error: 'Article non trouvé.' };
+    }
+
+    return post;
+  } catch (error) {
+    console.error(`Erreur lors de la récupération de l'article ${postId}:`, error);
+    setResponseStatus(event, 500);
+    return {
+      error: 'Impossible de lire les données de l\'article.',
+      details: error instanceof Error ? error.message : 'Erreur inconnue',
+    };
+  }
+});

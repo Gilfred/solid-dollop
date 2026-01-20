@@ -1,3 +1,7 @@
+
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,27 +13,26 @@ datasource db {
 
 model Category {
   id          Int      @id @default(autoincrement())
-  name        String   @unique
+  name        String   @map("categorie")
   description String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
   posts       Post[]
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
 
   @@map("categories")
 }
 
 model Post {
-  id          Int      @id @default(autoincrement())
-  title       String
-  content     String   @db.Text
-  slug        String   @unique
-  author      String
-  description String?
-  image       String?
-  categoryId  Int      @map("categorie_id")
-  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-
-  @@map("posts")
+  id           Int      @id @default(autoincrement())
+  title        String
+  content      String   @db.LongText
+  slug         String   @unique
+  author       String
+  description  String?
+  image        String?
+  categorie_id Int?
+  category     Category? @relation(fields: [categorie_id], references: [id])
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
 }
+
