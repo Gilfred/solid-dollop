@@ -2,7 +2,7 @@ export default defineEventHandler(async () => {
   try {
     const posts = await prisma.post.findMany({
       include: {
-        categorie: true,
+        category: true,
       },
     })
     return posts
