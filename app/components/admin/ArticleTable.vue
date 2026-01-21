@@ -242,3 +242,25 @@ const stats = computed(() => [
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Scrollbar personnalisée */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 6px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, rgb(147, 51, 234), rgb(79, 70, 229));
+  border-radius: 3px;
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, rgb(168, 85, 247), rgb(99, 102, 241));
+}
+
+</style>

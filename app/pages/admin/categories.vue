@@ -1,12 +1,14 @@
 <script setup lang="ts">
 definePageMeta({
   layout: 'dashboard-layout' as const,
-   headerAction: { label: 'Créer un catégorie', to: '/admin/categories/create', class: 'bg-green-600 text-white hover:bg-blue-700' }
 })
+import CategorieTable from '~/components/admin/CategorieTable.vue'  
+import CreateCategoriesModal from '~/components/admin/CreateCategoriesModal.vue';
 </script>
 <template>
-  <div class="space-y-4">
-
-    <!-- Table des articles ici... -->
-  </div>
+    
+        
+         <CategorieTable />
+         <CreateCategoriesModal />
+ 
 </template>
