@@ -13,10 +13,16 @@ Les packages suivants sont nécessaires pour l'authentification :
 ### 2. Commandes d'installation
 
 ```bash
-pnpm install better-auth
-# Si Prisma n'est pas encore configuré
-pnpm install prisma @prisma/client
+# Installation des dépendances
+pnpm install
+
+# Ajout de Better Auth
+pnpm add better-auth
+# Ajout du driver MySQL
+pnpm add mysql2
 ```
+
+> **Note sur pnpm 10+** : Si vous voyez un avertissement concernant les "Ignored build scripts", vous devrez peut-être exécuter `pnpm approve-builds` pour que Prisma fonctionne correctement.
 
 ## ⚙️ Configuration
 
@@ -39,9 +45,12 @@ Le schéma Prisma (`prisma/schema.prisma`) doit contenir les tables requises par
 
 Après avoir mis à jour le schéma, lancez :
 ```bash
-pnpm exec prisma generate
-pnpm exec prisma db push
+# Utilisation de npx pour une meilleure compatibilité
+npx prisma generate
+npx prisma db push
 ```
+
+*Si vous rencontrez une erreur `MODULE_NOT_FOUND` avec Prisma, assurez-vous d'avoir bien fait `pnpm install` et éventuellement `pnpm approve-builds`.*
 
 ### 3. Initialisation de Better Auth
 
@@ -112,4 +121,4 @@ Better Auth utilise des cookies pour gérer les sessions. Assurez-vous que votre
 ## 🛠 Commandes utiles
 
 - `pnpm dev` : Lancer le serveur de développement.
-- `pnpm exec prisma studio` : Explorer la base de données.
+- `npx prisma studio` : Explorer la base de données.
