@@ -1,14 +1,12 @@
 import { defineEventHandler, readMultipartFormData, setResponseStatus } from 'h3';
-import { writeFile } from 'fs/promises';
-import { resolve, extname } from 'path';
-import { readPosts, writePosts, type Post } from '../../utils/db';
+import { prisma } from '../../utils/prisma';
 
 export default defineEventHandler(async (event) => {
   try {
     const formData = await readMultipartFormData(event);
 
     if (!formData) {
-      setResponseStatus(event, 400); // Bad Request
+      setResponseStatus(event, 400);
       return { error: 'Requête invalide, formulaire manquant.' };
     }
 
@@ -19,6 +17,7 @@ export default defineEventHandler(async (event) => {
     const authorEntry = formData.find((p) => p.name === 'author');
     const descriptionEntry = formData.find((p) => p.name === 'description');
     const imageFile = formData.find((p) => p.name === 'image');
+    const categoryIdEntry = formData.find((p) => p.name === 'categorie_id');
 
     // Valider que tous les champs sont présents
     if (!titleEntry || !contentEntry || !slugEntry || !authorEntry || !descriptionEntry || !imageFile || !imageFile.filename) {
@@ -31,44 +30,78 @@ export default defineEventHandler(async (event) => {
     const slug = slugEntry.data.toString('utf-8');
     const author = authorEntry.data.toString('utf-8');
     const description = descriptionEntry.data.toString('utf-8');
-    // === Gestion de l'upload de l'image ===
+    const categoryId = categoryIdEntry ? parseInt(categoryIdEntry.data.toString('utf-8'), 10) : undefined;
+
+    // === Validation du type de fichier (Image) ===
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (imageFile.type && !allowedMimeTypes.includes(imageFile.type)) {
+      setResponseStatus(event, 400);
+      return { error: 'Format d\'image non supporté. Utilisez JPEG, PNG, WEBP ou GIF.' };
+    }
+
+    // === Gestion de l'upload de l'image avec useStorage ===
+    const storage = useStorage();
+    
+    // Générer un nom de fichier unique
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const extension = extname(imageFile.filename);
+    const originalName = imageFile.filename;
+    const extension = originalName.substring(originalName.lastIndexOf('.'));
     const newFilename = `post-${uniqueSuffix}${extension}`;
-    const imagePath = resolve('public', 'images', newFilename);
+    
+    // Chemin où stocker le fichier
+    const storagePath = `public/uploads/images/${newFilename}`;
+    
+    // Sauvegarder le fichier avec useStorage
+    await storage.setItem(storagePath, imageFile.data);
+    
+    // L'URL pour accéder au fichier (dépend de votre configuration)
+    // Note: Vous devrez configurer un serveur de fichiers statiques ou un endpoint pour servir ces fichiers
+    const imageUrl = `/uploads/images/${newFilename}`;
 
-    // Écrire le fichier image sur le disque
-    await writeFile(imagePath, imageFile.data);
-    const imageUrl = `/images/${newFilename}`; // URL publique de l'image
+    // === Vérifier si le slug existe déjà ===
+    const existingPost = await prisma.post.findUnique({
+      where: { slug }
+    });
 
-    // === Création du nouvel article ===
-    const posts = await readPosts();
-    const newPost: Post = {
-      id: posts.length > 0 ? Math.max(...posts.map(p => p.id)) + 1 : 1,
-      title,
-      content,
-      slug,
-      author,
-      description,
-      image: imageUrl,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
+    if (existingPost) {
+      setResponseStatus(event, 409); // Conflict
+      return { error: 'Un article avec ce slug existe déjà.' };
+    }
 
-    // Ajouter le nouvel article à la liste et sauvegarder le fichier JSON
-    posts.push(newPost);
-    await writePosts(posts);
+    // === Création du nouvel article avec Prisma ===
+    const newPost = await prisma.post.create({
+      data: {
+        title,
+        content,
+        slug,
+        author,
+        description,
+        image: imageUrl,
+        ...(categoryId && !isNaN(categoryId) ? {
+          category: {
+            connect: { id: categoryId }
+          }
+        } : {}),
+      },
+    });
 
     // Renvoyer l'article créé avec un statut 201
-    setResponseStatus(event, 201); // Created
+    setResponseStatus(event, 201);
     return newPost;
 
   } catch (error) {
     console.error('Erreur lors de la création de l\'article :', error);
-    setResponseStatus(event, 500); // Internal Server Error
+
+    // Gérer l'erreur de slug unique
+    if (typeof error === 'object' && error !== null && 'code' in error && error.code === 'P2002') {
+      setResponseStatus(event, 409);
+      return { error: 'Un article avec ce slug existe déjà.' };
+    }
+
+    setResponseStatus(event, 500);
     return {
       error: 'Une erreur est survenue lors de la création de l\'article.',
-      details: error.message,
+      details: error instanceof Error ? error.message : 'Erreur inconnue',
     };
   }
 });

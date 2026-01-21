@@ -1,22 +1,31 @@
-import { defineEventHandler } from 'h3';
-import { readPosts } from '../../utils/db';
+import { defineEventHandler, setResponseStatus } from 'h3';
+import { prisma } from '../../utils/prisma';
 
 export default defineEventHandler(async (event) => {
   try {
-    const posts = await readPosts();
-    
-    // retourner tous les champs sauf le champ content
-    const postsWithoutContent = posts.map(post =>{
-      const { content, ...postsWithoutContent } = post;
-      return postsWithoutContent;
-    })
-    return postsWithoutContent;
+    // Récupérer tous les posts avec leurs catégories, triés par date de création (plus récent d'abord)
+    const posts = await prisma.post.findMany({
+      include: {
+        category: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    // Retourner les posts sans la valeur du champ content
+    return posts.map((post: any) => {
+      // Créer un nouvel objet sans la propriété content
+      const { content, ...postWithoutContent } = post;
+      return postWithoutContent;
+    });
+
   } catch (error) {
-    // En cas d'erreur (ex: fichier JSON malformé), on renvoie une erreur 500
+    console.error('Erreur lors de la récupération des articles :', error);
     setResponseStatus(event, 500);
     return {
       error: 'Impossible de lire les données des articles.',
-      details: error.message,
+      details: error instanceof Error ? error.message : 'Erreur inconnue',
     };
   }
 });

@@ -19,6 +19,7 @@ declare global {
   const createEvent: typeof import('../../node_modules/.pnpm/h3@1.15.4/node_modules/h3').createEvent
   const createEventStream: typeof import('../../node_modules/.pnpm/h3@1.15.4/node_modules/h3').createEventStream
   const createRouter: typeof import('../../node_modules/.pnpm/h3@1.15.4/node_modules/h3').createRouter
+  const db: typeof import('../../server/utils/db').default
   const defaultContentType: typeof import('../../node_modules/.pnpm/h3@1.15.4/node_modules/h3').defaultContentType
   const defineAppConfig: typeof import('../../node_modules/.pnpm/@nuxt+nitro-server@4.2.2_db_2bcfbf3b55e43d0d278fbeba7c36268f/node_modules/@nuxt/nitro-server/dist/runtime/utils/config').defineAppConfig
   const defineCachedEventHandler: typeof import('../../node_modules/.pnpm/nitropack@2.13.0/node_modules/nitropack/dist/runtime/internal/cache').defineCachedEventHandler
@@ -81,6 +82,7 @@ declare global {
   const lazyEventHandler: typeof import('../../node_modules/.pnpm/h3@1.15.4/node_modules/h3').lazyEventHandler
   const nitroPlugin: typeof import('../../node_modules/.pnpm/nitropack@2.13.0/node_modules/nitropack/dist/runtime/internal/plugin').nitroPlugin
   const parseCookies: typeof import('../../node_modules/.pnpm/h3@1.15.4/node_modules/h3').parseCookies
+  const prisma: typeof import('../../server/utils/prisma').prisma
   const promisifyNodeListener: typeof import('../../node_modules/.pnpm/h3@1.15.4/node_modules/h3').promisifyNodeListener
   const proxyRequest: typeof import('../../node_modules/.pnpm/h3@1.15.4/node_modules/h3').proxyRequest
   const readBody: typeof import('../../node_modules/.pnpm/h3@1.15.4/node_modules/h3').readBody
@@ -149,4 +151,5 @@ export { appendCorsHeaders, appendCorsPreflightHeaders, appendHeader, appendHead
 export { buildAssetsURL as __buildAssetsURL, publicAssetsURL as __publicAssetsURL } from 'C:/Users/LENOVO/Desktop/Nuxt JS/solid-dollop/node_modules/.pnpm/@nuxt+nitro-server@4.2.2_db_2bcfbf3b55e43d0d278fbeba7c36268f/node_modules/@nuxt/nitro-server/dist/runtime/utils/paths';
 export { defineAppConfig } from 'C:/Users/LENOVO/Desktop/Nuxt JS/solid-dollop/node_modules/.pnpm/@nuxt+nitro-server@4.2.2_db_2bcfbf3b55e43d0d278fbeba7c36268f/node_modules/@nuxt/nitro-server/dist/runtime/utils/config';
 export { useImage } from 'C:/Users/LENOVO/Desktop/Nuxt JS/solid-dollop/node_modules/.pnpm/@nuxt+image@2.0.0_db0@0.3.4_ioredis@5.9.1_magicast@0.5.1/node_modules/@nuxt/image/dist/runtime/server/utils/image';
-export { readPosts, writePosts } from 'C:/Users/LENOVO/Desktop/Nuxt JS/solid-dollop/server/utils/db';
+export { default as db, readPosts, writePosts } from 'C:/Users/LENOVO/Desktop/Nuxt JS/solid-dollop/server/utils/db';
+export { prisma } from 'C:/Users/LENOVO/Desktop/Nuxt JS/solid-dollop/server/utils/prisma';

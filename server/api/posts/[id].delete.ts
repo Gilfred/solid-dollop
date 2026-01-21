@@ -1,11 +1,17 @@
+
 import { defineEventHandler, setResponseStatus } from 'h3';
 import { unlink } from 'fs/promises';
 import { resolve } from 'path';
-import { readPosts, writePosts } from '../../utils/db';
+import { prisma } from '../../utils/prisma';
 
 export default defineEventHandler(async (event) => {
-  // Récupérer l'ID depuis les paramètres de la route
-  const postId = parseInt(event.context.params.id, 10);
+  const params = event.context.params;
+  if (!params || !params.id) {
+    setResponseStatus(event, 400);
+    return { error: 'L\'ID de l\'article est requis.' };
+  }
+
+  const postId = parseInt(params.id, 10);
 
   if (isNaN(postId)) {
     setResponseStatus(event, 400); // Bad Request
@@ -13,42 +19,37 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const posts = await readPosts();
-    const postIndex = posts.findIndex((p) => p.id === postId);
+    // 1. Trouver l'article pour récupérer le chemin de l'image
+    const postToDelete = await prisma.post.findUnique({
+      where: { id: postId }
+    });
 
-    if (postIndex === -1) {
+    if (!postToDelete) {
       setResponseStatus(event, 404); // Not Found
       return { error: 'Article non trouvé.' };
     }
 
-    const postToDelete = posts[postIndex];
-
-    // === Suppression de l'image associée ===
+    // 2. Suppression de l'image associée si elle existe
     if (postToDelete.image) {
-      // Le chemin dans le JSON est /images/nom-fichier.jpg
-      // On le transforme en chemin système : public/images/nom-fichier.jpg
       const imageName = postToDelete.image.split('/').pop();
       if (imageName) {
         const imagePath = resolve('public', 'images', imageName);
         try {
           await unlink(imagePath);
         } catch (unlinkError) {
-          // Si le fichier image n'existe pas, on peut ignorer l'erreur
-          // et continuer la suppression des données.
-          if (unlinkError.code !== 'ENOENT') {
+          if (unlinkError instanceof Error && 'code' in unlinkError && unlinkError.code !== 'ENOENT') {
             console.error(`Impossible de supprimer le fichier image ${imagePath}:`, unlinkError);
-            // On peut choisir de bloquer la suppression ici ou juste de logger l'erreur.
-            // Pour ce cas, nous allons continuer.
           }
         }
       }
     }
 
-    // === Suppression de l'article du JSON ===
-    posts.splice(postIndex, 1);
-    await writePosts(posts);
+    // 3. Suppression de l'article de la base de données
+    await prisma.post.delete({
+      where: { id: postId }
+    });
 
-    // Renvoyer une réponse 204 No Content, qui signifie succès sans corps de réponse
+    // Renvoyer une réponse 204 No Content
     setResponseStatus(event, 204);
     return null;
 
@@ -57,7 +58,8 @@ export default defineEventHandler(async (event) => {
     setResponseStatus(event, 500); // Internal Server Error
     return {
       error: 'Une erreur est survenue lors de la suppression de l\'article.',
-      details: error.message,
+      details: error instanceof Error ? error.message : 'Erreur inconnue',
     };
   }
 });
+

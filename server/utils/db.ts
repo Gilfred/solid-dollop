@@ -1,9 +1,11 @@
-import { writeFile, readFile } from 'fs/promises';
-import { resolve } from 'path';
+// server/utils/db.ts
+import { PrismaClient } from '@prisma/client'
 
-// Définir le chemin vers notre fichier JSON
-const dataPath = resolve('data', 'post.json');
+const prisma = new PrismaClient({
+  datasourceUrl: process.env.DATABASE_URL,
+})
 
+<<<<<<< HEAD
 // Définir le type pour un article
 export interface Post {
   id: number;
@@ -34,3 +36,6 @@ export async function readPosts(): Promise<Post[]> {
 export async function writePosts(posts: Post[]): Promise<void> {
   await writeFile(dataPath, JSON.stringify(posts, null, 2), 'utf-8');
 }
+=======
+export default prisma
+>>>>>>> origin/init_bdd

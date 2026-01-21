@@ -1,8 +1,15 @@
+
 import { defineEventHandler, readBody, setResponseStatus } from 'h3';
-import { readPosts, writePosts, type Post } from '../../utils/db';
+import { prisma } from '../../utils/prisma';
 
 export default defineEventHandler(async (event) => {
-  const postId = parseInt(event.context.params.id, 10);
+  const params = event.context.params;
+  if (!params || !params.id) {
+    setResponseStatus(event, 400);
+    return { error: 'L\'ID de l\'article est requis.' };
+  }
+
+  const postId = parseInt(params.id, 10);
 
   if (isNaN(postId)) {
     setResponseStatus(event, 400);
@@ -11,59 +18,53 @@ export default defineEventHandler(async (event) => {
 
   try {
     const body = await readBody(event);
-    const { title, content, slug, author, description, image } = body;
+    const { title, content, slug, author, description, image, categorie_id } = body;
 
     // Liste des champs modifiables
-    const updatableFields = ['title', 'content', 'slug', 'author', 'description', 'image'];
-    const hasValidUpdate = updatableFields.some(field => 
+    const updatableFields = ['title', 'content', 'slug', 'author', 'description', 'image', 'categorie_id'];
+    const hasValidUpdate = updatableFields.some(field =>
       field in body && body[field] !== undefined
     );
 
     if (!hasValidUpdate) {
       setResponseStatus(event, 400);
-      return { 
+      return {
         error: `Au moins un champ (${updatableFields.join(', ')}) doit être fourni pour la mise à jour.`
       };
     }
 
-    const posts = await readPosts();
-    const postIndex = posts.findIndex((p) => p.id === postId);
-
-    if (postIndex === -1) {
-      setResponseStatus(event, 404);
-      return { error: 'Article non trouvé.' };
-    }
-
-    // Maj des champs uniquement fournis
-    const originalPost = posts[postIndex];
-    const updatedPost: Post = {
-      ...originalPost,
-      // Permet de mettre à jour avec des chaînes vides
-      title: title !== undefined ? title : originalPost.title,
-      content: content !== undefined ? content : originalPost.content,
-      slug: slug !== undefined ? slug : originalPost.slug,
-      author: author !== undefined ? author : originalPost.author,
-      description: description !== undefined ? description : originalPost.description,
-      image: image !== undefined ? image : originalPost.image,
-      updated_at: new Date().toISOString(),
-    };
-
-    // Validation optionnelle du slug (uniquement si modifié)
-    if (slug !== undefined && slug !== originalPost.slug) {
-      const slugExists = posts.some(p => p.id !== postId && p.slug === slug);
-      if (slugExists) {
-        setResponseStatus(event, 409);
-        return { error: 'Ce slug est déjà utilisé par un autre article.' };
-      }
-    }
-
-    posts[postIndex] = updatedPost;
-    await writePosts(posts);
+    const updatedPost = await prisma.post.update({
+      where: { id: postId },
+      data: {
+        title: title !== undefined ? title : undefined,
+        content: content !== undefined ? content : undefined,
+        slug: slug !== undefined ? slug : undefined,
+        author: author !== undefined ? author : undefined,
+        description: description !== undefined ? description : undefined,
+        image: image !== undefined ? image : undefined,
+        ...(categorie_id !== undefined ? {
+          category: categorie_id ? { connect: { id: parseInt(categorie_id, 10) } } : { disconnect: true }
+        } : {}),
+      },
+    });
 
     return updatedPost;
 
   } catch (error) {
     console.error(`Erreur lors de la mise à jour de l'article ${postId}:`, error);
+
+    // Gérer l'erreur de slug unique
+    if (typeof error === 'object' && error !== null && 'code' in error && error.code === 'P2002') {
+        setResponseStatus(event, 409);
+        return { error: 'Ce slug est déjà utilisé par un autre article.' };
+    }
+
+    // Gérer article non trouvé
+    if (typeof error === 'object' && error !== null && 'code' in error && error.code === 'P2025') {
+        setResponseStatus(event, 404);
+        return { error: 'Article non trouvé.' };
+    }
+
     setResponseStatus(event, 500);
     return {
       error: 'Une erreur est survenue lors de la mise à jour de l\'article.',

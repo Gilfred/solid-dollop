@@ -12,23 +12,37 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+
     "@nuxt/image": "^2.0.0",
     "@nuxt/ui": "^4.3.0",
     "@vueuse/core": "^14.1.0",
+    "@prisma/client": "^6.19.2",
     "nuxt": "^4.2.2",
     "vue": "^3.5.26",
     "vue-router": "^4.6.4"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
     "@iconify-json/lucide": "^1.2.86",
     "@types/node": "^25.0.9",
+    "@prisma/client": "6.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.53.0",
+    "@typescript-eslint/parser": "^8.53.0",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
     "eslint-plugin-vue": "^10.6.2",
     "globals": "^17.0.0",
     "prettier": "^3.7.4",
-    "tailwindcss": "^4.1.18"
+
+    "tailwindcss": "^4.1.18",
+    "prisma": "^6.19.2",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2",
+    "tsx": "^4.21.0"
   }
+
 }
