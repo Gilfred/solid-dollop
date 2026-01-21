@@ -1,5 +1,5 @@
-/// <reference types="@nuxt/image" />
 /// <reference types="@nuxt/ui" />
+/// <reference types="@nuxt/image" />
 /// <reference types="@nuxt/telemetry" />
 /// <reference types="@nuxt/devtools" />
 /// <reference path="types/builder-env.d.ts" />

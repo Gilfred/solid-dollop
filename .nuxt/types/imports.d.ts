@@ -44,6 +44,7 @@ declare global {
   const getRouteRules: typeof import('../../node_modules/.pnpm/nuxt@4.2.2_@parcel+watcher@_d2d8e213736ed4a5d08d7b99bd882d1d/node_modules/nuxt/dist/app/composables/manifest').getRouteRules
   const h: typeof import('vue').h
   const hasInjectionContext: typeof import('vue').hasInjectionContext
+  const headerActionConfig: typeof import('../../app/composables/headerAction.config').headerActionConfig
   const inject: typeof import('vue').inject
   const injectHead: typeof import('../../node_modules/.pnpm/nuxt@4.2.2_@parcel+watcher@_d2d8e213736ed4a5d08d7b99bd882d1d/node_modules/nuxt/dist/app/composables/head').injectHead
   const inputIdInjectionKey: typeof import('../../node_modules/.pnpm/@nuxt+ui@4.3.0_@babel+parse_74af9ee1a7165c006ac48d3dede4394c/node_modules/@nuxt/ui/dist/runtime/composables/useFormField').inputIdInjectionKey
@@ -263,6 +264,7 @@ declare module 'vue' {
     readonly getRouteRules: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt@4.2.2_@parcel+watcher@_d2d8e213736ed4a5d08d7b99bd882d1d/node_modules/nuxt/dist/app/composables/manifest')['getRouteRules']>
     readonly h: UnwrapRef<typeof import('vue')['h']>
     readonly hasInjectionContext: UnwrapRef<typeof import('vue')['hasInjectionContext']>
+    readonly headerActionConfig: UnwrapRef<typeof import('../../app/composables/headerAction.config')['headerActionConfig']>
     readonly inject: UnwrapRef<typeof import('vue')['inject']>
     readonly injectHead: UnwrapRef<typeof import('../../node_modules/.pnpm/nuxt@4.2.2_@parcel+watcher@_d2d8e213736ed4a5d08d7b99bd882d1d/node_modules/nuxt/dist/app/composables/head')['injectHead']>
     readonly inputIdInjectionKey: UnwrapRef<typeof import('../../node_modules/.pnpm/@nuxt+ui@4.3.0_@babel+parse_74af9ee1a7165c006ac48d3dede4394c/node_modules/@nuxt/ui/dist/runtime/composables/useFormField')['inputIdInjectionKey']>

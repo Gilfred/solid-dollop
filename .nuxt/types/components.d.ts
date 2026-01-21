@@ -20,6 +20,9 @@ interface _GlobalComponents {
   'AppHero': typeof import("../../app/components/AppHero.vue").default
   'AppListe': typeof import("../../app/components/AppListe.vue").default
   'BlogPostCard': typeof import("../../app/components/BlogPostCard.vue").default
+  'AdminDashboardHeader': typeof import("../../app/components/admin/AdminDashboardHeader.vue").default
+  'ArticleTable': typeof import("../../app/components/admin/ArticleTable.vue").default
+  'CreateArticleModal': typeof import("../../app/components/admin/CreateArticleModal.vue").default
   'Sidebar': typeof import("../../app/components/admin/Sidebar.vue").default
   'UColorModeAvatar': typeof import("../../node_modules/.pnpm/@nuxt+ui@4.3.0_@babel+parse_74af9ee1a7165c006ac48d3dede4394c/node_modules/@nuxt/ui/dist/runtime/components/color-mode/ColorModeAvatar.vue").default
   'UColorModeButton': typeof import("../../node_modules/.pnpm/@nuxt+ui@4.3.0_@babel+parse_74af9ee1a7165c006ac48d3dede4394c/node_modules/@nuxt/ui/dist/runtime/components/color-mode/ColorModeButton.vue").default
@@ -173,6 +176,9 @@ interface _GlobalComponents {
   'LazyAppHero': LazyComponent<typeof import("../../app/components/AppHero.vue").default>
   'LazyAppListe': LazyComponent<typeof import("../../app/components/AppListe.vue").default>
   'LazyBlogPostCard': LazyComponent<typeof import("../../app/components/BlogPostCard.vue").default>
+  'LazyAdminDashboardHeader': LazyComponent<typeof import("../../app/components/admin/AdminDashboardHeader.vue").default>
+  'LazyArticleTable': LazyComponent<typeof import("../../app/components/admin/ArticleTable.vue").default>
+  'LazyCreateArticleModal': LazyComponent<typeof import("../../app/components/admin/CreateArticleModal.vue").default>
   'LazySidebar': LazyComponent<typeof import("../../app/components/admin/Sidebar.vue").default>
   'LazyUColorModeAvatar': LazyComponent<typeof import("../../node_modules/.pnpm/@nuxt+ui@4.3.0_@babel+parse_74af9ee1a7165c006ac48d3dede4394c/node_modules/@nuxt/ui/dist/runtime/components/color-mode/ColorModeAvatar.vue").default>
   'LazyUColorModeButton': LazyComponent<typeof import("../../node_modules/.pnpm/@nuxt+ui@4.3.0_@babel+parse_74af9ee1a7165c006ac48d3dede4394c/node_modules/@nuxt/ui/dist/runtime/components/color-mode/ColorModeButton.vue").default>

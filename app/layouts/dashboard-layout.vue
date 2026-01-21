@@ -6,6 +6,7 @@
 
     <!-- Panel -->
     <UDashboardPanel>
+      <AdminDashboardHeader />
       <slot />
     </UDashboardPanel>
   </UDashboardGroup>
