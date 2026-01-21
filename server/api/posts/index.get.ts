@@ -6,14 +6,20 @@ export default defineEventHandler(async (event) => {
     // Récupérer tous les posts avec leurs catégories, triés par date de création (plus récent d'abord)
     const posts = await prisma.post.findMany({
       include: {
-        category: true, // Jointure avec la table Category: la relation s'appelle 'category' mais le champ est 'categorie_id'
+        category: true,
       },
       orderBy: {
-        createdAt: 'desc', // faire un tri décroissant par date de création
+        createdAt: 'desc',
       },
     });
 
-    return posts;
+    // Retourner les posts sans la valeur du champ content
+    return posts.map((post: any) => {
+      // Créer un nouvel objet sans la propriété content
+      const { content, ...postWithoutContent } = post;
+      return postWithoutContent;
+    });
+
   } catch (error) {
     console.error('Erreur lors de la récupération des articles :', error);
     setResponseStatus(event, 500);

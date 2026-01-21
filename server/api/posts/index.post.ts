@@ -1,6 +1,4 @@
 import { defineEventHandler, readMultipartFormData, setResponseStatus } from 'h3';
-import { writeFile, mkdir } from 'fs/promises';
-import { resolve, extname } from 'path';
 import { prisma } from '../../utils/prisma';
 
 export default defineEventHandler(async (event) => {
@@ -8,7 +6,7 @@ export default defineEventHandler(async (event) => {
     const formData = await readMultipartFormData(event);
 
     if (!formData) {
-      setResponseStatus(event, 400); // Bad Request
+      setResponseStatus(event, 400);
       return { error: 'Requête invalide, formulaire manquant.' };
     }
 
@@ -41,19 +39,34 @@ export default defineEventHandler(async (event) => {
       return { error: 'Format d\'image non supporté. Utilisez JPEG, PNG, WEBP ou GIF.' };
     }
 
-    // === Gestion de l'upload de l'image ===
+    // === Gestion de l'upload de l'image avec useStorage ===
+    const storage = useStorage();
+    
+    // Générer un nom de fichier unique
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const extension = extname(imageFile.filename);
+    const originalName = imageFile.filename;
+    const extension = originalName.substring(originalName.lastIndexOf('.'));
     const newFilename = `post-${uniqueSuffix}${extension}`;
-    const imagesDir = resolve('public', 'images');
-    const imagePath = resolve(imagesDir, newFilename);
+    
+    // Chemin où stocker le fichier
+    const storagePath = `public/uploads/images/${newFilename}`;
+    
+    // Sauvegarder le fichier avec useStorage
+    await storage.setItem(storagePath, imageFile.data);
+    
+    // L'URL pour accéder au fichier (dépend de votre configuration)
+    // Note: Vous devrez configurer un serveur de fichiers statiques ou un endpoint pour servir ces fichiers
+    const imageUrl = `/uploads/images/${newFilename}`;
 
-    // S'assurer que le dossier images existe
-    await mkdir(imagesDir, { recursive: true });
+    // === Vérifier si le slug existe déjà ===
+    const existingPost = await prisma.post.findUnique({
+      where: { slug }
+    });
 
-    // Écrire le fichier image sur le disque
-    await writeFile(imagePath, imageFile.data);
-    const imageUrl = `/images/${newFilename}`; // URL publique de l'image
+    if (existingPost) {
+      setResponseStatus(event, 409); // Conflict
+      return { error: 'Un article avec ce slug existe déjà.' };
+    }
 
     // === Création du nouvel article avec Prisma ===
     const newPost = await prisma.post.create({
@@ -73,7 +86,7 @@ export default defineEventHandler(async (event) => {
     });
 
     // Renvoyer l'article créé avec un statut 201
-    setResponseStatus(event, 201); // Created
+    setResponseStatus(event, 201);
     return newPost;
 
   } catch (error) {
@@ -81,11 +94,11 @@ export default defineEventHandler(async (event) => {
 
     // Gérer l'erreur de slug unique
     if (typeof error === 'object' && error !== null && 'code' in error && error.code === 'P2002') {
-        setResponseStatus(event, 409);
-        return { error: 'Un article avec ce slug existe déjà.' };
+      setResponseStatus(event, 409);
+      return { error: 'Un article avec ce slug existe déjà.' };
     }
 
-    setResponseStatus(event, 500); // Internal Server Error
+    setResponseStatus(event, 500);
     return {
       error: 'Une erreur est survenue lors de la création de l\'article.',
       details: error instanceof Error ? error.message : 'Erreur inconnue',
