@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
         category: true,
       },
       orderBy: {
-        createdAt: 'desc',
+        created_at: 'desc',
       },
     });
 
