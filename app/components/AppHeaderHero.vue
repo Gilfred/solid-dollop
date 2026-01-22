@@ -94,18 +94,14 @@ onMounted(() => {
       <div class="absolute inset-0 bg-gradient-to-b from-black/60 to-black/40"></div>
     </div>
 
+    <AppHeader :nav-items="navItems" class="relative z-10" />
+
     <!-- Contenu hero -->
     <div class="hero-content relative z-10 container mx-auto px-4 pt-5 pb-11 min-h-screen flex flex-col justify-center items-center text-center text-white">
        
       <!-- 1. Logo -->
       <div class="flex items-left gap-3">
-         <div class="bg-gradient-to-r from-purple-600 to-indigo-600 p-3 rounded-xl mb-10">
-              <UIcon name="i-heroicons-home-modern" class="w-8 h-8 text-white" />
-            </div>
-            <div>
-              <h2 class="font-gravitas text-2xl font-bold">Luxe & Design</h2>
-              <p class="text-purple-300 text-left text-sm">L'art de vivre</p>
-            </div>
+         
           </div>
       <!-- 1. Badge -->
       <span

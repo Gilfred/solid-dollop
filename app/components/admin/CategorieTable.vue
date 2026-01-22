@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, h, resolveComponent } from 'vue'
 import type { TableColumn } from '@nuxt/ui'
+import type { Category } from '../../../types/categorie'
 
 const UCard = resolveComponent('UCard')
 const USkeleton = resolveComponent('USkeleton')
@@ -25,69 +26,42 @@ type Category = {
 // Données
 const categories = ref<Category[]>([])
 const loading = ref(true)
+const error = ref('')
 
-onMounted(() => {
-  setTimeout(() => {
-    categories.value = [
-      { 
-        id: 1, 
-        name: 'Architecture moderne', 
-        slug: 'architecture-moderne',
-        description: 'Découvrez les plus belles réalisations architecturales contemporaines',
-        icon: 'i-heroicons-building-office',
-        color: '#9333EA',
-        articlesCount: 24, 
-        status: 'Active', 
-        createdAt: '2026-01-10'
-      },
-      { 
-        id: 2, 
-        name: 'Design d\'intérieur', 
-        slug: 'design-interieur',
-        description: 'L\'art de créer des espaces de vie élégants et fonctionnels',
-        icon: 'i-heroicons-sparkles',
-        color: '#6366F1',
-        articlesCount: 18, 
-        status: 'Active', 
-        createdAt: '2026-01-12'
-      },
-      { 
-        id: 3, 
-        name: 'Lifestyle', 
-        slug: 'lifestyle',
-        description: 'Inspirations et tendances pour un art de vivre raffiné',
-        icon: 'i-heroicons-heart',
-        color: '#EC4899',
-        articlesCount: 32, 
-        status: 'Active', 
-        createdAt: '2026-01-15'
-      },
-      { 
-        id: 4, 
-        name: 'Rénovation', 
-        slug: 'renovation',
-        description: 'Conseils et astuces pour transformer votre espace',
-        icon: 'i-heroicons-scissors',
-        color: '#F59E0B',
-        articlesCount: 12, 
-        status: 'Active', 
-        createdAt: '2026-01-18'
-      },
-      { 
-        id: 5, 
-        name: 'Galerie', 
-        slug: 'galerie',
-        description: 'Collections d\'images inspirantes',
-        icon: 'i-heroicons-photo',
-        color: '#10B981',
-        articlesCount: 0, 
-        status: 'Inactive', 
-        createdAt: '2026-01-19'
-      }
-    ]
+// L'URL de ton API interne Nuxt (par exemple server/api/categories.get.ts)
+const fetchCategories = async () => {
+  loading.value = true
+  error.value = ''
+  try {
+    const data = await $fetch<Category[]>('/api/categories') // ton endpoint Nuxt
+    categories.value = data
+  } catch (err: any) {
+    console.error('Erreur API interne:', err)
+    error.value = 'Impossible de récupérer les catégories.'
+  } finally {
     loading.value = false
-  }, 1500)
-})
+  }
+}
+// Appel au montage
+onMounted(() => fetchCategories())
+
+ // Fonction de suppression
+const deleteCategory = async (id: number) => {
+  if (!confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ?')) return
+
+  loading.value = true
+  try {
+    await $fetch(`/api/categories/${id}`, { method: 'DELETE' })
+    // Retirer la catégorie du tableau local pour mise à jour instantanée
+    categories.value = categories.value.filter(c => c.id !== id)
+  } catch (err: any) {
+    console.error('Erreur suppression:', err)
+    alert('Impossible de supprimer la catégorie.')
+  } finally {
+    loading.value = false
+  }
+}
+
 
 // Colonnes
 const columns: TableColumn<Category>[] = [
@@ -202,7 +176,8 @@ const columns: TableColumn<Category>[] = [
           square: true,
           size: 'sm',
           class: '!text-red-500 dark:!text-red-400 hover:!bg-red-100/50 dark:hover:!bg-red-900/30',
-          title: 'Supprimer'
+          title: 'Supprimer',
+          onClick: () => deleteCategory(row.original.id)
         })
       ])
     }

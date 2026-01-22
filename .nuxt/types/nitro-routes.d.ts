@@ -13,7 +13,6 @@ declare module "nitropack/types" {
       'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/categories/index.post').default>>>>
     }
     '/api/posts/:id': {
-      'delete': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/posts/[id].delete').default>>>>
       'get': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/posts/[id].get').default>>>>
       'put': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/posts/[id].put').default>>>>
     }
@@ -22,13 +21,13 @@ declare module "nitropack/types" {
       'post': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/api/posts/index.post').default>>>>
     }
     '/__nuxt_error': {
-      'default': Simplify<Serialize<Awaited<ReturnType<typeof import('../../node_modules/.pnpm/@nuxt+nitro-server@4.2.2_db_2bcfbf3b55e43d0d278fbeba7c36268f/node_modules/@nuxt/nitro-server/dist/runtime/handlers/renderer').default>>>>
+      'default': Simplify<Serialize<Awaited<ReturnType<typeof import('../../node_modules/.pnpm/@nuxt+nitro-server@4.2.2_db_7f13a28f5b17f50989a1830cd15e8758/node_modules/@nuxt/nitro-server/dist/runtime/handlers/renderer').default>>>>
     }
     '/__nuxt_island/**': {
       'default': Simplify<Serialize<Awaited<ReturnType<typeof import('../../server/#internal/nuxt/island-renderer').default>>>>
     }
     '/api/_nuxt_icon/:collection': {
-      'default': Simplify<Serialize<Awaited<ReturnType<typeof import('../../node_modules/.pnpm/@nuxt+icon@2.2.0_magicast@0_4637dbfe837a2ad596d2701defdc4f05/node_modules/@nuxt/icon/dist/runtime/server/api').default>>>>
+      'default': Simplify<Serialize<Awaited<ReturnType<typeof import('../../node_modules/.pnpm/@nuxt+icon@2.2.0_magicast@0_8a9daf60de66b5c526acbcb33afcbd13/node_modules/@nuxt/icon/dist/runtime/server/api').default>>>>
     }
     '/_ipx/**': {
       'default': Simplify<Serialize<Awaited<ReturnType<typeof import('../../node_modules/.pnpm/@nuxt+image@2.0.0_db0@0.3.4_ioredis@5.9.1_magicast@0.5.1/node_modules/@nuxt/image/dist/runtime/server/routes/_ipx').default>>>>

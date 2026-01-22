@@ -4,6 +4,8 @@ import { ref } from 'vue'
 
 const { data: posts } = await useFetch<Post[]>('/api/posts')
 
+console.log('Fetched posts:', posts.value)
+
 // Séparer les articles tendances des autres
 const trendingPosts = computed(() => (posts.value || []).slice(0, 3))
 const regularPosts = computed(() => (posts.value || []).slice(3))
@@ -81,7 +83,7 @@ const prevSlide = () => {
                   <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
                   <NuxtLink :to="`/blog/${post.id}`" class="absolute bottom-0 left-0 right-0 p-8 text-white">
                     <span class="inline-block px-3 py-1 bg-purple-500 rounded-full text-xs font-semibold mb-3">
-                      Tendance
+                      {{ post.category.name || 'Article' }}
                     </span>
                     <h3 class="text-3xl font-bold mb-2">{{ post.title }}</h3>
                     <div class="flex items-center gap-2 text-sm opacity-90">
@@ -138,7 +140,7 @@ const prevSlide = () => {
                     class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   />
                   <span class="absolute top-3 left-3 px-3 py-1 bg-black/70 backdrop-blur-sm text-white text-xs rounded-full">
-                    {{ post.category || 'Article' }}
+                    {{ post.category.name || 'Article' }}
                   </span>
                 </div>
                 <div class="p-5">

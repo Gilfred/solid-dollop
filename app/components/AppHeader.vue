@@ -87,11 +87,7 @@ const items = computed<NavigationMenuItem[]>(() => [
             class="hidden sm:flex"
           />
           
-          <UColorModeButton 
-          :color="isScrolled ? 'primary' : 'neutral'"
-            :variant="isScrolled ? 'ghost' : 'soft'"
-            size="lg"
-          />
+          
 
           <UButton
             color="primary"

@@ -5,37 +5,4 @@ const prisma = new PrismaClient({
   datasourceUrl: process.env.DATABASE_URL,
 })
 
-<<<<<<< HEAD
-// Définir le type pour un article
-export interface Post {
-  id: number;
-  slug: string;
-  description: string;
-  title: string;
-  content: string;
-  image: string; // chemin relatif vers l'image, ex: '/images/mon-image.jpg'
-  created_at: string;
-  updated_at: string;
-}
-
-// Fonction pour lire les articles depuis le fichier JSON
-export async function readPosts(): Promise<Post[]> {
-  try {
-    const fileContent = await readFile(dataPath, 'utf-8');
-    return JSON.parse(fileContent) as Post[];
-  } catch (error) {
-    // Si le fichier n'existe pas ou est vide, on retourne un tableau vide
-    if (error.code === 'ENOENT') {
-      return [];
-    }
-    throw error;
-  }
-}
-
-// Fonction pour écrire les articles dans le fichier JSON
-export async function writePosts(posts: Post[]): Promise<void> {
-  await writeFile(dataPath, JSON.stringify(posts, null, 2), 'utf-8');
-}
-=======
 export default prisma
->>>>>>> origin/init_bdd

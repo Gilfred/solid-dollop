@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
+import { Icon } from '@iconify/vue'  // composant Vue pour icônes
+
+import type { Category } from '../../../types/categorie' // <-- ton fichier types
 
 // Simule la récupération de l'utilisateur connecté
 const currentUser = 'Zaki AGOKOLI'
@@ -26,14 +29,17 @@ const form = reactive<Post>({
   author: ''
 })
 
-// Liste des catégories avec icônes
-const categories = [
-  { value: 'Tech', label: 'Technologie', icon: 'i-heroicons-cpu-chip' },
-  { value: 'Lifestyle', label: 'Style de vie', icon: 'i-heroicons-sparkles' },
-  { value: 'Voyage', label: 'Voyage', icon: 'i-heroicons-globe-alt' },
-  { value: 'Sport', label: 'Sport', icon: 'i-heroicons-trophy' },
-  { value: 'Business', label: 'Business', icon: 'i-heroicons-briefcase' }
-]
+// Liste des catégories typées
+const categories = ref<Category[]>([])
+
+onMounted(async () => {
+  try {
+    const res = await fetch('/api/categories')
+    categories.value = await res.json() as Category[]
+  } catch (error) {
+    console.error('Erreur lors du chargement des catégories', error)
+  }
+})
 
 // Gestion des fichiers upload
 const handleFiles = (event: Event) => {
@@ -57,29 +63,68 @@ const titleMaxLength = 80
 const descriptionMaxLength = 160
 
 // Soumission
-const submit = () => {
-  if (!isFormValid.value) {
-    return
+const submit = async () => {
+  if (!isFormValid.value) return;
+
+  if (form.author === 'self') {
+    form.author = currentUser;
   }
 
-  if (form.author === 'self') form.author = currentUser
+  const formData = new FormData();
 
-  console.log('POST CRÉÉ 👉', { ...form })
+  // Changement ici pour correspondre au backend
+  formData.append('title', form.title);
+  formData.append('content', form.content);
+  formData.append('description', form.description);
+  formData.append('author', form.author || '');
 
-  // Reset
-  Object.assign(form, {
-    category: '',
-    title: '',
-    content: '',
-    description: '',
-    images: [],
-    author: ''
-  })
+  // Générer un slug simple (ex: basé sur le titre)
+  const slug = form.title
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^a-z0-9-]/g, '');
+  formData.append('slug', slug);
 
-  isOpen.value = false
-}
+  // Catégorie
+  formData.append('categorie_id', form.category.toString()); // Assure-toi que form.category est bien l'ID numérique
+
+  // Image (le backend attend un seul fichier nommé 'image')
+  if (form.images.length > 0) {
+    formData.append('image', form.images[0]);
+  }
+
+  try {
+    const res = await fetch('/api/posts', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      console.error('Erreur du serveur ❌', text);
+      return;
+    }
+
+    const data = await res.json();
+    console.log('Article créé ✅', data);
+
+    // reset
+    Object.assign(form, {
+      category: '',
+      title: '',
+      content: '',
+      description: '',
+      images: [],
+      author: '',
+    });
+
+    isOpen.value = false;
+  } catch (error) {
+    console.error('Erreur ❌', error);
+  }
+};
+
 </script>
-
 <template>
   <!-- BOUTON OUVRIR LE MODAL -->
   <button
@@ -138,27 +183,26 @@ const submit = () => {
           </label>
           <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
             <button
-              v-for="cat in categories"
-              :key="cat.value"
-              @click="form.category = cat.value"
-              :class="[
-                'group relative flex items-center gap-2 px-4 py-3 rounded-xl border-2 transition-all duration-200',
-                form.category === cat.value
-                  ? 'border-purple-600 dark:border-indigo-500 bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950/30 dark:to-indigo-950/30'
-                  : 'border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-indigo-700 bg-white dark:bg-gray-900'
-              ]"
-            >
-              <svg class="w-5 h-5 transition-colors" :class="form.category === cat.value ? 'text-purple-600 dark:text-indigo-400' : 'text-gray-400 group-hover:text-purple-500 dark:group-hover:text-indigo-400'" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path v-if="cat.value === 'Tech'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
-                <path v-else-if="cat.value === 'Lifestyle'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                <path v-else-if="cat.value === 'Voyage'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                <path v-else-if="cat.value === 'Sport'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-              <span :class="['text-sm font-medium', form.category === cat.value ? 'text-purple-700 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-300']">
-                {{ cat.label }}
-              </span>
-            </button>
+  v-for="cat in categories"
+  :key="cat.id"
+  @click="form.category = cat.id"
+  :class="[
+    'group relative flex items-center gap-2 px-4 py-3 rounded-xl border-2 transition-all duration-200',
+    form.category === cat.id
+      ? 'border-purple-600 dark:border-indigo-500 bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950/30 dark:to-indigo-950/30'
+      : 'border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-indigo-700 bg-white dark:bg-gray-900'
+  ]"
+>
+  <Icon
+    :icon="cat.icon" 
+    class="w-5 h-5 transition-colors"
+    :class="form.category === cat.id ? 'text-purple-600 dark:text-indigo-400' : 'text-gray-400 group-hover:text-purple-500 dark:group-hover:text-indigo-400'"
+  />
+  <span :class="['text-sm font-medium', form.category === cat.id ? 'text-purple-700 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-300']">
+    {{ cat.name }}
+  </span>
+</button>
+
           </div>
         </div>
 

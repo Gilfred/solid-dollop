@@ -1,1 +1,1 @@
-export { default } from "file:///C:/Users/LENOVO/Desktop/Nuxt%20JS/solid-dollop/node_modules/.pnpm/@nuxt+vite-builder@4.2.2_@t_41ece60d5b0d102f38dfbde746817647/node_modules/@nuxt/vite-builder/dist/runtime/vite-node.mjs"
+export { default } from "file:///C:/Users/LENOVO/Desktop/Nuxt%20JS/solid-dollop/node_modules/.pnpm/@nuxt+vite-builder@4.2.2_@t_4ff813044ee00075d6a5fcf65e52bca1/node_modules/@nuxt/vite-builder/dist/runtime/vite-node.mjs"

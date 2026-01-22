@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
-import type { IPost } from '../../../types/post'
+import type { Post } from '../../../types/post'
 
 const route = useRoute()
 const id = computed(() => parseInt(route.params.id as string))
@@ -51,7 +51,7 @@ const { data: post, pending } = await useFetch<Post | null>(
             <!-- Category Badge -->
             <div class="absolute top-6 left-6">
               <span class="inline-block px-4 py-2 bg-purple-600 text-white text-sm font-semibold rounded-full shadow-lg">
-                {{ post.category || 'Article' }}
+                {{ post.category.name || 'Article' }}
               </span>
             </div>
           </div>

@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, h, resolveComponent } from 'vue'
 import type { TableColumn } from '@nuxt/ui'
+import type { Post } from '../../../types/post'
+const UTable = resolveComponent('UTable')
+
+
 
 const UCard = resolveComponent('UCard')
 const USkeleton = resolveComponent('USkeleton')
@@ -22,18 +26,56 @@ type Article = {
 const articles = ref<Article[]>([])
 const loading = ref(true)
 
-onMounted(() => {
-  setTimeout(() => {
-    articles.value = [
-      { id: 1, title: 'Premier article', status: 'Publié', date: '2026-01-10', views: 1234, category: 'Design' },
-      { id: 2, title: 'Deuxième article', status: 'Brouillon', date: '2026-01-12', views: 0, category: 'Tech' },
-      { id: 3, title: 'Troisième article', status: 'Publié', date: '2026-01-15', views: 856, category: 'Lifestyle' },
-      { id: 4, title: 'Quatrième article', status: 'Publié', date: '2026-01-18', views: 2341, category: 'Design' },
-      { id: 5, title: 'Cinquième article', status: 'Brouillon', date: '2026-01-19', views: 0, category: 'Art' }
-    ]
+onMounted(async () => {
+  try {
+    const response = await fetch('/api/posts')
+    if (!response.ok) throw new Error('Erreur lors du fetch des posts')
+
+    const data: Post[] = await response.json()
+
+    // Transformation pour correspondre au type Article de ton tableau
+    articles.value = data.map(post => ({
+      id: post.id,
+      title: post.title,
+      category: post.category,
+      date: post.created_at,
+      status: 'Publié',       // ou calculé selon ton API
+      views: 0                 // pas fourni dans le type Post
+    }))
+  } catch (error) {
+    console.error('Impossible de récupérer les posts :', error)
+    articles.value = []
+  } finally {
     loading.value = false
-  }, 1500)
+  }
 })
+
+// Fonction pour supprimer un article
+async function deleteArticle(id: number) {
+  try {
+    const confirmed = confirm('Voulez-vous vraiment supprimer cet article ?')
+    if (!confirmed) return
+
+    const response = await fetch(`/api/posts/${id}`, { method: 'DELETE' })
+    if (!response.ok) throw new Error('Erreur lors de la suppression de l’article')
+
+    // Retirer l’article de la liste locale
+    articles.value = articles.value.filter(a => a.id !== id)
+    alert('Article supprimé avec succès ✅')
+  } catch (error) {
+    console.error(error)
+    alert('Impossible de supprimer l’article ❌')
+  }
+}
+
+// Fonction pour modifier un article
+// Dans ton script setup
+const emit = defineEmits(['edit-article'])
+
+async function editArticle(article: Article) {
+  emit('edit-article', article) // <-- au lieu de window.location.href
+}
+
 
 // Colonnes
 const columns: TableColumn<Article>[] = [
@@ -96,31 +138,43 @@ const columns: TableColumn<Article>[] = [
     }
   },
   {
-    accessorKey: 'actions',
-    header: 'Actions',
-    cell: ({ row }) => {
-      return h('div', { class: 'flex items-center gap-1 px-4 py-4 border-b border-gray-100 dark:border-gray-800/50 hover:bg-gradient-to-r hover:from-purple-50/30 hover:via-transparent hover:to-indigo-50/30 dark:hover:from-purple-950/10 dark:hover:via-transparent dark:hover:to-indigo-950/10 transition-all duration-200' }, [
+  accessorKey: 'actions',
+  header: 'Actions',
+  cell: ({ row }) => {
+    const article = row.original
+    return h('div', { class: 'flex items-center gap-1 px-4 py-4 border-b border-gray-100 dark:border-gray-800/50 hover:bg-gradient-to-r hover:from-purple-50/30 hover:via-transparent hover:to-indigo-50/30 dark:hover:from-purple-950/10 dark:hover:via-transparent dark:hover:to-indigo-950/10 transition-all duration-200' }, [
         h(UButton, { 
-          icon: 'i-heroicons-pencil-square',
+          icon: 'i-heroicons-eye',
           variant: 'ghost',
           color: 'gray',
           square: true,
           size: 'sm',
-          class: '!text-purple-600 dark:!text-indigo-400 hover:!bg-purple-100/50 dark:hover:!bg-indigo-900/30'
-        }),
-        h(UButton, { 
-          icon: 'i-heroicons-trash',
-          variant: 'ghost',
-          color: 'gray',
-          square: true,
-          size: 'sm',
-          class: '!text-red-500 dark:!text-red-400 hover:!bg-red-100/50 dark:hover:!bg-red-900/30'
-        })
-      ])
-    }
+          class: '!text-blue-600 dark:!text-blue-400 hover:!bg-blue-100/50 dark:hover:!bg-blue-900/30',
+          title: 'Voir les articles'
+        }),  
+    h(UButton, { 
+        icon: 'i-heroicons-pencil-square',
+        variant: 'ghost',
+        color: 'gray',
+        square: true,
+        size: 'sm',
+        class: '!text-purple-600 dark:!text-indigo-400 hover:!bg-purple-100/50 dark:hover:!bg-indigo-900/30',
+        onClick: () => editArticle(article)
+      }),
+      h(UButton, { 
+        icon: 'i-heroicons-trash',
+        variant: 'ghost',
+        color: 'gray',
+        square: true,
+        size: 'sm',
+        class: '!text-red-500 dark:!text-red-400 hover:!bg-red-100/50 dark:hover:!bg-red-900/30',
+        onClick: () => deleteArticle(article.id)
+      })
+    ])
   }
-]
+},
 
+]
 // Stats calculées
 const stats = computed(() => [
   {
@@ -206,6 +260,7 @@ const stats = computed(() => [
               variant="ghost"
               color="gray"
               square
+              
               class="!text-purple-600 dark:!text-indigo-400 hover:!bg-purple-100/50 dark:hover:!bg-indigo-900/30"
             />
             <UButton
@@ -214,6 +269,15 @@ const stats = computed(() => [
               color="gray"
               square
               class="!text-purple-600 dark:!text-indigo-400 hover:!bg-purple-100/50 dark:hover:!bg-indigo-900/30"
+            />
+             <UButton
+              icon="i-heroicons-arrow-path"
+              variant="ghost"
+              color="gray"
+              square
+              class="!text-purple-600 dark:!text-indigo-400 hover:!bg-purple-100/50 dark:hover:!bg-indigo-900/30"
+              title="Actualiser"
+              @click="loading = true; setTimeout(() => loading = false, 1000)"
             />
           </div>
         </div>

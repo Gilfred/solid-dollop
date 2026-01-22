@@ -27,7 +27,7 @@ model Post {
   title        String
   content      String   @db.LongText
   slug         String   @unique
-  author       String
+  author       String?
   description  String?
   image        String?
   categorie_id Int?
