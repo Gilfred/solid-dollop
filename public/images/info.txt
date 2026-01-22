@@ -1,0 +1,2 @@
+n'oublie pas de créer le dossier images.
+j'ai fais ce fichier pour que le dossier puisse pusher sur git

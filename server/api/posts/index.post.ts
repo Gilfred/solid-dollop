@@ -75,20 +75,14 @@ export default defineEventHandler(async (event) => {
       };
     }
 
-    // Gestion de l'upload de l'image
-    
-    // 1. Créer une instance du stockage configuré pour 'uploads'
-    const storage = useStorage('uploads');
-    
-    // 2. Générer un nom de fichier sécurisé et unique
+    // === Gestion de l'upload de l'image ===
+    // Générer un nom de fichier unique
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     const originalName = imageFile.filename;
     
-    // Extraire l'extension du fichier
-    let extension = '.jpg'; // extension par défaut
+    let extension = '.jpg';
     if (originalName.includes('.')) {
       const ext = originalName.substring(originalName.lastIndexOf('.')).toLowerCase();
-      // Valider que l'extension correspond au type MIME
       const mimeToExt: Record<string, string> = {
         'image/jpeg': '.jpg',
         'image/jpg': '.jpg',
@@ -99,7 +93,6 @@ export default defineEventHandler(async (event) => {
       extension = mimeToExt[imageFile.type?.toLowerCase() || ''] || ext;
     }
     
-    // Nettoyer le nom de fichier
     const baseName = originalName.includes('.') 
       ? originalName.substring(0, originalName.lastIndexOf('.'))
       : originalName;
@@ -109,17 +102,45 @@ export default defineEventHandler(async (event) => {
       .replace(/-+/g, '-')
       .toLowerCase();
     
-    // Nom de fichier final
-    const newFilename = `post-${uniqueSuffix}-${safeFilename}${extension}`;
+    const newFilename = `posts/${uniqueSuffix}-${safeFilename}${extension}`;
+    let imageUrl: string;
+    let storageMethod: 'vercel-blob' | 'local' = 'local';
     
-    // 3. Chemin de stockage (relatif au stockage 'uploads')
-    const storagePath = newFilename;
+    // Vérifier le token Blob
+    const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
     
-    // 4. Sauvegarder le fichier
-    await storage.setItem(storagePath, imageFile.data);
+    // Détecter si c'est un token de test/masqué
+    const isTestToken = !blobToken || blobToken.includes('******') || blobToken.length < 30;
     
-    // 5. URL pour accéder au fichier (correspond à la config publicAssets)
-    const imageUrl = `/uploads/${newFilename}`;
+    if (isTestToken) {
+      storageMethod = 'local';
+    } else {
+      try {
+        const { put } = await import('@vercel/blob');
+        const blob = await put(newFilename, imageFile.data, {
+          access: 'public',
+        });
+        
+        imageUrl = blob.url;
+        storageMethod = 'vercel-blob';
+      } catch (blobError: any) {
+        storageMethod = 'local';
+      }
+    }
+    
+    // Fallback au stockage local si Vercel Blob échoue
+    if (storageMethod === 'local') {
+      const fs = await import('fs/promises');
+      const path = await import('path');
+      
+      const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+      await fs.mkdir(uploadsDir, { recursive: true });
+      
+      const filePath = path.join(uploadsDir, newFilename.replace('posts/', ''));
+      await fs.writeFile(filePath, imageFile.data);
+      
+      imageUrl = `/uploads/${newFilename.replace('posts/', '')}`;
+    }
 
     // Vérifier si le slug existe déjà
     const existingPost = await prisma.post.findUnique({
@@ -157,14 +178,14 @@ export default defineEventHandler(async (event) => {
     return {
       success: true,
       message: 'Article créé avec succès',
-      data: newPost
+      data: newPost,
+      storage: storageMethod
     };
 
   } catch (error) {
     console.error('Erreur lors de la création de l\'article:', error);
 
     if (error instanceof Error) {
-      // Gestion des erreurs Prisma
       if ('code' in error) {
         switch (error.code) {
           case 'P2002':
