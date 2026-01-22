@@ -5,69 +5,135 @@ export default defineEventHandler(async (event) => {
   try {
     const formData = await readMultipartFormData(event);
 
-    if (!formData) {
+    if (!formData || formData.length === 0) {
       setResponseStatus(event, 400);
-      return { error: 'Requête invalide, formulaire manquant.' };
+      return { 
+        error: 'Requête invalide, formulaire manquant ou vide.'
+      };
     }
 
-    // Extraire les champs texte et le fichier image
-    const titleEntry = formData.find((p) => p.name === 'title');
-    const contentEntry = formData.find((p) => p.name === 'content');
-    const slugEntry = formData.find((p) => p.name === 'slug');
-    const authorEntry = formData.find((p) => p.name === 'author');
-    const descriptionEntry = formData.find((p) => p.name === 'description');
-    const imageFile = formData.find((p) => p.name === 'image');
-    const subCategoryIdEntry = formData.find((p) => p.name === 'sub_category_id');
+    // Extraire les champs
+    const getField = (name: string) => formData.find(p => p.name === name);
+    
+    const titleEntry = getField('title');
+    const contentEntry = getField('content');
+    const slugEntry = getField('slug');
+    const authorEntry = getField('author');
+    const descriptionEntry = getField('description');
+    const imageFile = getField('image');
+    const subCategoryIdEntry = getField('sub_category_id');
 
-    // Valider que tous les champs sont présents
-    if (!titleEntry || !contentEntry || !slugEntry || !authorEntry || !descriptionEntry || !imageFile || !imageFile.filename) {
+    // Validation des champs requis
+    const missingFields = [];
+    if (!titleEntry) missingFields.push('title');
+    if (!contentEntry) missingFields.push('content');
+    if (!slugEntry) missingFields.push('slug');
+    if (!imageFile || !imageFile.filename) missingFields.push('image');
+    if (!subCategoryIdEntry) missingFields.push('sub_category_id');
+
+    if (missingFields.length > 0) {
       setResponseStatus(event, 400);
-      return { error: 'Champs manquants. "title", "content", "slug", "author", "description" et "image" sont requis.' };
+      return { 
+        error: `Champs manquants: ${missingFields.join(', ')}`
+      };
     }
 
+    // Extraire les valeurs
     const title = titleEntry.data.toString('utf-8');
     const content = contentEntry.data.toString('utf-8');
     const slug = slugEntry.data.toString('utf-8');
-    const author = authorEntry.data.toString('utf-8');
-    const description = descriptionEntry.data.toString('utf-8');
-    const subCategoryId = subCategoryIdEntry ? parseInt(subCategoryIdEntry.data.toString('utf-8'), 10) : undefined;
+    const author = authorEntry?.data.toString('utf-8') || null;
+    const description = descriptionEntry?.data.toString('utf-8') || null;
+    const subCategoryId = parseInt(subCategoryIdEntry.data.toString('utf-8'), 10);
 
-    // === Validation du type de fichier (Image) ===
-    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-    if (imageFile.type && !allowedMimeTypes.includes(imageFile.type)) {
+    // Validation de subCategoryId
+    if (isNaN(subCategoryId)) {
       setResponseStatus(event, 400);
-      return { error: 'Format d\'image non supporté. Utilisez JPEG, PNG, WEBP ou GIF.' };
+      return { 
+        error: 'sub_category_id doit être un nombre valide'
+      };
     }
 
-    // === Gestion de l'upload de l'image avec useStorage ===
-    const storage = useStorage();
+    // Vérifier que la sous-catégorie existe
+    const subCategoryExists = await prisma.subCategory.findUnique({
+      where: { id: subCategoryId }
+    });
+
+    if (!subCategoryExists) {
+      setResponseStatus(event, 400);
+      return { 
+        error: 'La sous-catégorie spécifiée n\'existe pas'
+      };
+    }
+
+    // Validation du type de fichier
+    const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/jpg'];
+    if (imageFile.type && !allowedMimeTypes.includes(imageFile.type.toLowerCase())) {
+      setResponseStatus(event, 400);
+      return { 
+        error: 'Format d\'image non supporté. Utilisez JPEG, PNG, WEBP ou GIF.'
+      };
+    }
+
+    // Gestion de l'upload de l'image
     
-    // Générer un nom de fichier unique
+    // 1. Créer une instance du stockage configuré pour 'uploads'
+    const storage = useStorage('uploads');
+    
+    // 2. Générer un nom de fichier sécurisé et unique
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     const originalName = imageFile.filename;
-    const extension = originalName.substring(originalName.lastIndexOf('.'));
-    const newFilename = `post-${uniqueSuffix}${extension}`;
     
-    // Chemin où stocker le fichier
-    const storagePath = `public/images/${newFilename}`;
+    // Extraire l'extension du fichier
+    let extension = '.jpg'; // extension par défaut
+    if (originalName.includes('.')) {
+      const ext = originalName.substring(originalName.lastIndexOf('.')).toLowerCase();
+      // Valider que l'extension correspond au type MIME
+      const mimeToExt: Record<string, string> = {
+        'image/jpeg': '.jpg',
+        'image/jpg': '.jpg',
+        'image/png': '.png',
+        'image/webp': '.webp',
+        'image/gif': '.gif'
+      };
+      extension = mimeToExt[imageFile.type?.toLowerCase() || ''] || ext;
+    }
     
-    // Sauvegarder le fichier avec useStorage
+    // Nettoyer le nom de fichier
+    const baseName = originalName.includes('.') 
+      ? originalName.substring(0, originalName.lastIndexOf('.'))
+      : originalName;
+    
+    const safeFilename = baseName
+      .replace(/[^a-zA-Z0-9]/g, '-')
+      .replace(/-+/g, '-')
+      .toLowerCase();
+    
+    // Nom de fichier final
+    const newFilename = `post-${uniqueSuffix}-${safeFilename}${extension}`;
+    
+    // 3. Chemin de stockage (relatif au stockage 'uploads')
+    const storagePath = newFilename;
+    
+    // 4. Sauvegarder le fichier
     await storage.setItem(storagePath, imageFile.data);
     
-    // L'URL pour accéder au fichier
-    const imageUrl = `/images/${newFilename}`;
+    // 5. URL pour accéder au fichier (correspond à la config publicAssets)
+    const imageUrl = `/uploads/${newFilename}`;
 
-    // === Vérifier si le slug existe déjà ===
+    // Vérifier si le slug existe déjà
     const existingPost = await prisma.post.findUnique({
       where: { slug }
     });
 
     if (existingPost) {
-      setResponseStatus(event, 409); // Conflict
-      return { error: 'Un article avec ce slug existe déjà.' };
+      setResponseStatus(event, 409);
+      return { 
+        error: 'Un article avec ce slug existe déjà'
+      };
     }
 
-    // === Création du nouvel article avec Prisma ===
+    // Création de l'article
     const newPost = await prisma.post.create({
       data: {
         title,
@@ -76,31 +142,44 @@ export default defineEventHandler(async (event) => {
         author,
         description,
         image: imageUrl,
-        ...(subCategoryId && !isNaN(subCategoryId) ? {
-          subCategory: {
-            connect: { id: subCategoryId }
-          }
-        } : {}),
+        subCategoryId,
       },
+      include: {
+        subCategory: {
+          include: {
+            category: true
+          }
+        }
+      }
     });
 
-    // Renvoyer l'article créé avec un statut 201
     setResponseStatus(event, 201);
-    return newPost;
+    return {
+      success: true,
+      message: 'Article créé avec succès',
+      data: newPost
+    };
 
   } catch (error) {
-    console.error('Erreur lors de la création de l\'article :', error);
+    console.error('Erreur lors de la création de l\'article:', error);
 
-    // Gérer l'erreur de slug unique
-    if (typeof error === 'object' && error !== null && 'code' in error && error.code === 'P2002') {
-      setResponseStatus(event, 409);
-      return { error: 'Un article avec ce slug existe déjà.' };
+    if (error instanceof Error) {
+      // Gestion des erreurs Prisma
+      if ('code' in error) {
+        switch (error.code) {
+          case 'P2002':
+            setResponseStatus(event, 409);
+            return { error: 'Un article avec ce slug existe déjà' };
+          case 'P2003':
+            setResponseStatus(event, 400);
+            return { error: 'La sous-catégorie spécifiée n\'existe pas' };
+        }
+      }
     }
 
     setResponseStatus(event, 500);
     return {
-      error: 'Une erreur est survenue lors de la création de l\'article.',
-      details: error instanceof Error ? error.message : 'Erreur inconnue',
+      error: 'Une erreur est survenue lors de la création de l\'article.'
     };
   }
 });

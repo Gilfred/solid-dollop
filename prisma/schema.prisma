@@ -14,7 +14,7 @@ model Category {
   id            Int            @id @default(autoincrement())
   name          String         @map("categorie")
   slug          String         @unique
-  description   String
+  description   String?
   createdAt     DateTime       @default(now()) @map("created_at")
   updatedAt     DateTime       @updatedAt @map("updated_at")
   subcategories SubCategory[]
@@ -26,9 +26,9 @@ model SubCategory {
   id            Int       @id @default(autoincrement())
   name          String
   slug          String    @unique
-  description   String
-  icon          String
-  color         String
+  description   String?
+  icon          String?
+  color         String?
   
   // Relations
   categoryId    Int
@@ -49,11 +49,11 @@ model Post {
   slug            String       @unique
   author          String?
   description     String?
-  image           String
+  image           String?
   
-  // Relation avec SubCategory
-  subCategoryId   Int?
-  subCategory     SubCategory? @relation(fields: [subCategoryId], references: [id])
+  // Relation avec SubCategory - RENDUE REQUISE
+  subCategoryId   Int
+  subCategory     SubCategory  @relation(fields: [subCategoryId], references: [id])
   
   // Timestamps
   createdAt       DateTime     @default(now()) @map("created_at")
