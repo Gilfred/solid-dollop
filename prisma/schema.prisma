@@ -14,12 +14,33 @@ datasource db {
 model Category {
   id          Int      @id @default(autoincrement())
   name        String   @map("categorie")
+  slug        String        @unique
   description String?
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
   posts       Post[]
+  subcategories SubCategory[]
 
   @@map("categories")
+}
+
+model SubCategory {
+  id          Int       @id @default(autoincrement())
+  name        String
+  slug        String    @unique
+  description String?
+  icon        String?
+  color       String?
+  
+  // Relation avec Category (parent)
+  parentId    Int
+  category    Category  @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  
+  // Timestamps
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@map("sub_categories")
 }
 
 model Post {
