@@ -17,9 +17,7 @@
     "@nuxt/image": "^2.0.0",
     "@nuxt/ui": "^4.3.0",
     "@prisma/client": "^6.19.2",
-
     "@vueuse/core": "^14.1.0",
-
     "better-auth": "^1.4.17",
     "mysql2": "^3.16.1",
     "nuxt": "^4.2.2",
