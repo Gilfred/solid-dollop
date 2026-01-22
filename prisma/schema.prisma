@@ -14,7 +14,7 @@ datasource db {
 model Category {
   id          Int      @id @default(autoincrement())
   name        String   @map("categorie")
-  slug        String        @unique
+  slug  String  @unique @default("temp-slug")    
   description String?
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
