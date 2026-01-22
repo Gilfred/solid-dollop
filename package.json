@@ -31,6 +31,7 @@
     "@iconify-json/lucide": "^1.2.86",
     "@prisma/client": "6.0.0",
     "@types/node": "^25.0.9",
+
     "@typescript-eslint/eslint-plugin": "^8.53.0",
     "@typescript-eslint/parser": "^8.53.0",
     "eslint": "^9.39.2",
@@ -46,3 +47,4 @@
     "typescript": "^5.2.2"
   }
 }
+
