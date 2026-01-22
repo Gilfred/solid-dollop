@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
     const authorEntry = formData.find((p) => p.name === 'author');
     const descriptionEntry = formData.find((p) => p.name === 'description');
     const imageFile = formData.find((p) => p.name === 'image');
-    const categoryIdEntry = formData.find((p) => p.name === 'categorie_id');
+    const subCategoryIdEntry = formData.find((p) => p.name === 'sub_category_id');
 
     // Valider que tous les champs sont présents
     if (!titleEntry || !contentEntry || !slugEntry || !authorEntry || !descriptionEntry || !imageFile || !imageFile.filename) {
@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
     const slug = slugEntry.data.toString('utf-8');
     const author = authorEntry.data.toString('utf-8');
     const description = descriptionEntry.data.toString('utf-8');
-    const categoryId = categoryIdEntry ? parseInt(categoryIdEntry.data.toString('utf-8'), 10) : undefined;
+    const subCategoryId = subCategoryIdEntry ? parseInt(subCategoryIdEntry.data.toString('utf-8'), 10) : undefined;
 
     // === Validation du type de fichier (Image) ===
     const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
@@ -49,14 +49,13 @@ export default defineEventHandler(async (event) => {
     const newFilename = `post-${uniqueSuffix}${extension}`;
     
     // Chemin où stocker le fichier
-    const storagePath = `public/uploads/images/${newFilename}`;
+    const storagePath = `public/images/${newFilename}`;
     
     // Sauvegarder le fichier avec useStorage
     await storage.setItem(storagePath, imageFile.data);
     
-    // L'URL pour accéder au fichier (dépend de votre configuration)
-    // Note: Vous devrez configurer un serveur de fichiers statiques ou un endpoint pour servir ces fichiers
-    const imageUrl = `/uploads/images/${newFilename}`;
+    // L'URL pour accéder au fichier
+    const imageUrl = `/images/${newFilename}`;
 
     // === Vérifier si le slug existe déjà ===
     const existingPost = await prisma.post.findUnique({
@@ -77,9 +76,9 @@ export default defineEventHandler(async (event) => {
         author,
         description,
         image: imageUrl,
-        ...(categoryId && !isNaN(categoryId) ? {
-          category: {
-            connect: { id: categoryId }
+        ...(subCategoryId && !isNaN(subCategoryId) ? {
+          subCategory: {
+            connect: { id: subCategoryId }
           }
         } : {}),
       },

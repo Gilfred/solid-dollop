@@ -7,6 +7,9 @@ export default defineEventHandler(async (event) => {
       include: {
         category: true,
       },
+      orderBy: {
+        createdAt: 'desc',
+      },
     });
   return subCategories;
 } catch (error) {

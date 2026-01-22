@@ -22,10 +22,16 @@ export default defineEventHandler(async (event) => {
 
   try {
     // Recherche de l'article dans la base de données avec Prisma
-    // Inclut également les données de la catégorie associée
+    // Inclut également les données de la sous-catégorie associée
     const post = await prisma.post.findUnique({
       where: { id: postId }, // Clause WHERE pour filtrer par ID
-      include: { category: true } // Jointure avec la table Category
+      include: {
+        subCategory: {
+          include: {
+            category: true
+          }
+        }
+      } // Jointure avec la table SubCategory
     });
 
     // Si aucun article n'est trouvé, retourner une erreur 404

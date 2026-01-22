@@ -18,10 +18,10 @@ export default defineEventHandler(async (event) => {
 
   try {
     const body = await readBody(event);
-    const { title, content, slug, author, description, image, categorie_id } = body;
+    const { title, content, slug, author, description, image, sub_category_id } = body;
 
     // Liste des champs modifiables
-    const updatableFields = ['title', 'content', 'slug', 'author', 'description', 'image', 'categorie_id'];
+    const updatableFields = ['title', 'content', 'slug', 'author', 'description', 'image', 'sub_category_id'];
     const hasValidUpdate = updatableFields.some(field =>
       field in body && body[field] !== undefined
     );
@@ -42,8 +42,8 @@ export default defineEventHandler(async (event) => {
         author: author !== undefined ? author : undefined,
         description: description !== undefined ? description : undefined,
         image: image !== undefined ? image : undefined,
-        ...(categorie_id !== undefined ? {
-          category: categorie_id ? { connect: { id: parseInt(categorie_id, 10) } } : { disconnect: true }
+        ...(sub_category_id !== undefined ? {
+          subCategory: sub_category_id ? { connect: { id: parseInt(sub_category_id, 10) } } : { disconnect: true }
         } : {}),
       },
     });

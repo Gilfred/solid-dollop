@@ -21,7 +21,7 @@ importers:
         specifier: ^4.3.0
         version: 4.3.0(a492382add45b93319e14cad668e3015)
       '@prisma/client':
-        specifier: ^6.19.2
+        specifier: 6.19.2
         version: 6.19.2(prisma@6.19.2(magicast@0.5.1)(typescript@5.9.3))(typescript@5.9.3)
       '@vueuse/core':
         specifier: ^14.1.0
@@ -76,7 +76,7 @@ importers:
         specifier: ^3.7.4
         version: 3.7.4
       prisma:
-        specifier: ^6.19.2
+        specifier: 6.19.2
         version: 6.19.2(magicast@0.5.1)(typescript@5.9.3)
       tailwindcss:
         specifier: ^4.1.18

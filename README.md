@@ -84,39 +84,50 @@ export default defineEventHandler(async (event) => {
 });
 ```
 
-## 🧪 Tests avec Postman ou Insomnia
+## 🧪 Tests des APIs avec Postman ou Insomnia
 
-Better Auth utilise des cookies pour gérer les sessions. Assurez-vous que votre client API (Postman/Insomnia) accepte et renvoie les cookies.
+### 1. Gestion de l'Authentification (Better Auth)
 
-### 1. Inscription (Register)
-- **URL** : `POST http://localhost:3000/api/auth/sign-up/email`
-- **Body** (JSON) :
+Better Auth fonctionne principalement avec des **cookies de session**. Voici comment procéder pour tester vos routes protégées :
+
+#### A. Inscription (Sign-Up)
+- **Méthode** : `POST`
+- **URL** : `http://localhost:3000/api/auth/sign-up/email`
+- **Body (JSON)** :
   ```json
   {
-    "email": "test@example.com",
-    "password": "Password123!",
-    "name": "Utilisateur Test"
+    "email": "user@example.com",
+    "password": "password123",
+    "name": "John Doe"
   }
   ```
 
-### 2. Connexion (Login)
-- **URL** : `POST http://localhost:3000/api/auth/sign-in/email`
-- **Body** (JSON) :
+#### B. Connexion (Sign-In) - **Étape Cruciale**
+- **Méthode** : `POST`
+- **URL** : `http://localhost:3000/api/auth/sign-in/email`
+- **Body (JSON)** :
   ```json
   {
-    "email": "test@example.com",
-    "password": "Password123!"
+    "email": "user@example.com",
+    "password": "password123"
   }
   ```
-- **Note** : Après un login réussi, Better Auth définit un cookie de session.
+- **Dans Postman** : Une fois que vous envoyez cette requête, Postman va automatiquement stocker les cookies (`better-auth.session_token`) reçus dans la réponse.
 
-### 3. Vérifier la session actuelle
-- **URL** : `GET http://localhost:3000/api/me`
-- **Headers** : Le cookie de session doit être présent.
+#### C. Accès aux routes protégées
+Une fois connecté, Postman renverra automatiquement le cookie de session lors des requêtes suivantes vers le même domaine (`localhost`).
+- **Test de session** : `GET http://localhost:3000/api/me`
+- Si vous recevez une erreur `401 Unauthorized`, vérifiez l'onglet **Cookies** dans Postman pour vous assurer que `better-auth.session_token` est présent pour `localhost`.
 
-### 4. Déconnexion (Logout)
-- **URL** : `POST http://localhost:3000/api/auth/sign-out`
-- **Body** : `{}` (Vide)
+> **Astuce Alternative** : Si les cookies ne fonctionnent pas dans votre client API, vous pouvez utiliser le header `Authorization`. Après le sign-in, récupérez le `token` dans la réponse (si disponible) ou depuis les cookies et envoyez-le ainsi : `Authorization: Bearer <votre_token>`.
+
+#### D. Déconnexion (Sign-Out)
+- **Méthode** : `POST`
+- **URL** : `http://localhost:3000/api/auth/sign-out`
+- **Body** : `{}` (un objet vide est requis)
+
+### 2. Guide Complet des Endpoints
+Pour un guide détaillé de tous les endpoints (Posts, Categories, SubCategories), consultez le fichier **[TESTING.md](./TESTING.md)**.
 
 ## 🛠 Commandes utiles
 

@@ -34,7 +34,7 @@ model SubCategory {
   // Relations
   categoryId    Int
   category      Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  posts         Post[]
+  posts      Post[]   @relation("SubCategoryPosts")
   
   // Timestamps
   createdAt     DateTime  @default(now()) @map("created_at")
