@@ -1,6 +1,29 @@
-# Guide de Test des Endpoints Post & SubCategory
+# Guide de Test des Endpoints API
 
-Ce document explique comment tester les endpoints de l'API Post et SubCategory.
+Ce document explique comment tester les endpoints de l'API Post, SubCategory et l'Authentification.
+
+---
+
+## 🔐 AUTHENTIFICATION (BETTER AUTH)
+
+L'authentification utilise des cookies de session. Dans Postman, assurez-vous que les cookies sont activés pour `localhost`.
+
+### 1. Inscription
+- **POST** `/api/auth/sign-up/email`
+- **Body (JSON)** : `{ "email": "admin@test.com", "password": "password123", "name": "Admin" }`
+
+### 2. Connexion
+- **POST** `/api/auth/sign-in/email`
+- **Body (JSON)** : `{ "email": "admin@test.com", "password": "password123" }`
+- *Après cette étape, vous êtes authentifié.*
+
+### 3. Vérifier mon profil
+- **GET** `/api/me`
+- *Retourne vos informations si vous êtes connecté.*
+
+### 4. Déconnexion
+- **POST** `/api/auth/sign-out`
+- **Body (JSON)** : `{}`
 
 ---
 
