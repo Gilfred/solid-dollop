@@ -1,7 +1,7 @@
 export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event)
-    const { name, description } = body
+    const { name, slug, description } = body
 
     if (!name) {
       throw createError({
@@ -13,8 +13,9 @@ export default defineEventHandler(async (event) => {
     const newCategorie = await prisma.category.create({
       data: {
         name,
+        slug,
         description,
-      },
+      } as any, // il me permet d'ajuster le type ici par rapport au schéma Prisma
     })
 
     setResponseStatus(event, 201)

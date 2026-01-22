@@ -10,14 +10,15 @@ export default defineEventHandler(async (event) => {
 
   try {
     const body = await readBody(event)
-    const { name, description } = body
+    const { name, slug, description } = body
 
     const updatedCategorie = await prisma.category.update({
       where: { id },
       data: {
         name,
+        slug,
         description,
-      },
+      } as any, // il me permet d'ajuster le type ici par rapport au schéma Prisma
     })
 
     return updatedCategorie
