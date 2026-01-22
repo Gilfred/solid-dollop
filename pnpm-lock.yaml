@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       '@prisma/client':
-        specifier: ^6.19.2
+        specifier: 6.19.2
         version: 6.19.2(prisma@6.19.2(magicast@0.5.1)(typescript@5.9.3))(typescript@5.9.3)
       better-auth:
         specifier: ^1.4.17
@@ -55,7 +55,7 @@ importers:
         specifier: ^3.7.4
         version: 3.7.4
       prisma:
-        specifier: ^6.19.2
+        specifier: 6.19.2
         version: 6.19.2(magicast@0.5.1)(typescript@5.9.3)
       tsx:
         specifier: ^4.21.0

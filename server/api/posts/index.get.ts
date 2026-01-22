@@ -3,13 +3,17 @@ import { prisma } from '../../utils/prisma';
 
 export default defineEventHandler(async (event) => {
   try {
-    // Récupérer tous les posts avec leurs catégories, triés par date de création (plus récent d'abord)
+    // Récupérer tous les posts avec leurs sous-catégories, triés par date de création (plus récent d'abord)
     const posts = await prisma.post.findMany({
       include: {
-        category: true,
+        subCategory: {
+          include: {
+            category: true
+          }
+        },
       },
       orderBy: {
-        created_at: 'desc',
+        createdAt: 'desc',
       },
     });
 
