@@ -26,30 +26,36 @@ type Article = {
 const articles = ref<Article[]>([])
 const loading = ref(true)
 
-onMounted(async () => {
+
+const error = ref('')
+
+const fetchPosts = async () => {
+  loading.value = true
+  error.value = ''
   try {
-    const response = await fetch('/api/posts')
-    if (!response.ok) throw new Error('Erreur lors du fetch des posts')
+    // Récupération via $fetch côté Nuxt 3
+    const data = await $fetch<Post[]>('/api/posts')
 
-    const data: Post[] = await response.json()
-
-    // Transformation pour correspondre au type Article de ton tableau
+    // Transformation pour correspondre à ton type Article
     articles.value = data.map(post => ({
       id: post.id,
       title: post.title,
-      category: post.category,
-      date: post.created_at,
-      status: 'Publié',       // ou calculé selon ton API
-      views: 0                 // pas fourni dans le type Post
+      category: post.subCategory || 'Sans catégorie',
+      date: post.createdAt, // Prisma renvoie camelCase
+      status: 'Publié',
+      views: 0
     }))
-  } catch (error) {
-    console.error('Impossible de récupérer les posts :', error)
+  } catch (err: any) {
+    console.error('Erreur API interne:', err)
+    error.value = 'Impossible de récupérer les articles.'
     articles.value = []
   } finally {
     loading.value = false
   }
-})
+}
 
+// Appel initial
+fetchPosts()
 // Fonction pour supprimer un article
 async function deleteArticle(id: number) {
   try {

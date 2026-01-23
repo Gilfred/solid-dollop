@@ -1,6 +1,13 @@
 <script setup lang="ts">
+  import { useAuth } from "../../../composables/useAuth"
+
 definePageMeta({
   layout: 'dashboard-layout',
+ middleware: async () => {
+    const { session } = useAuth()
+    await session.value || navigateTo("/auth/login")
+  }
+
 })
 
 

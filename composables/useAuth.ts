@@ -1,32 +1,31 @@
-// composables/useAuth.ts
-import { ref } from 'vue'
+import { createAuthClient } from "better-auth/client";
 
 export const useAuth = () => {
-  const user = ref<{ email: string; role: 'admin' | 'user' } | null>(null)
-  const token = ref<string | null>(null)
+  const authClient = createAuthClient({
+    baseURL: "http://localhost:3000",
+    fetchOptions: { credentials: "include" }, // obligatoire
+  });
 
-  const login = async (email: string, password: string) => {
-    const res = await $fetch('/api/auth', {
-      method: 'POST',
-      body: { email, password }
-    })
-    token.value = res.token
-    user.value = res.user
-  }
+  const session = useState("session", () => null);
 
-  const register = async (email: string, password: string, role: 'admin' | 'user' = 'user') => {
-    const res = await $fetch('/api/register', {
-      method: 'POST',
-      body: { email, password, role }
-    })
-    token.value = res.token
-    user.value = res.user
-  }
+  const loginWithGoogle = async () => {
+    await authClient.signIn.social({ provider: "google" });
+  };
 
-  const logout = () => {
-    user.value = null
-    token.value = null
-  }
+  const logout = async () => {
+    await authClient.signOut();
+    session.value = null;
+  };
 
-  return { user, token, login, register, logout }
-}
+  const fetchSession = async () => {
+    try {
+      const res = await $fetch("/api/me", { credentials: "include" });
+      session.value = res.user || null;
+    } catch (e) {
+      console.error("SESSION CLIENT ❌", e);
+      session.value = null;
+    }
+  };
+
+  return { session, loginWithGoogle, logout, fetchSession };
+};

@@ -46,14 +46,19 @@ const availableColors = [
   { value: '#EF4444', label: 'Red' },
   { value: '#6B7280', label: 'Gray' }
 ]
+const parentCategories = ref<{ value: string | number; label: string }[]>([])
 
 // Catégories parentes (simulation)
-const parentCategories = [
-  { value: '', label: 'Aucune (catégorie principale)' },
-  { value: 'architecture', label: 'Architecture' },
-  { value: 'design', label: 'Design d\'intérieur' },
-  { value: 'lifestyle', label: 'Lifestyle' }
-]
+onMounted(async () => {
+  const categories = await $fetch('/api/categories')
+  parentCategories.value = categories.map((c: any) => ({
+    value: c.id,    // ou c.slug si tu préfères utiliser le slug
+    label: c.name
+  }))
+})
+
+
+
 
 // Auto-génération du slug à partir du nom
 const generateSlug = () => {
@@ -75,10 +80,51 @@ const nameMaxLength = 50
 const descriptionMaxLength = 200
 
 // Soumission
-const submit = () => {
-  if (!isFormValid.value) return
+const loading = ref(false)
+const error = ref<string | null>(null)
 
-  console.log('CATÉGORIE CRÉÉE 👉', { ...form })
+const submit = async () => {
+  if (!isFormValid.value) return;
+
+  loading.value = true;
+  error.value = null;
+
+  try {
+    // Convertir parentCategory en categoryId avant envoi
+    const payload = {
+      name: form.name,
+      slug: form.slug,
+      description: form.description,
+      icon: form.icon,
+      color: form.color,
+      categoryId: form.parentCategory || null // Met null si vide
+    };
+
+    const response = await $fetch('/api/subCategory', {
+      method: 'POST',
+      body: payload
+    });
+
+    if (response) {
+      Object.assign(form, {
+        name: '',
+        slug: '',
+        description: '',
+        icon: '',
+        color: '#9333EA',
+        parentCategory: ''
+      });
+      isOpen.value = false;
+    }
+  } catch (err: any) {
+    console.error(err);
+    error.value = err?.message || 'Erreur lors de la création';
+  } finally {
+    loading.value = false;
+  }
+};
+
+
 
   // Reset
   Object.assign(form, {
@@ -91,7 +137,7 @@ const submit = () => {
   })
 
   isOpen.value = false
-}
+
 </script>
 
 <template>

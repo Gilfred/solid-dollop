@@ -33,7 +33,7 @@ const fetchCategories = async () => {
   loading.value = true
   error.value = ''
   try {
-    const data = await $fetch<Category[]>('/api/categories') // ton endpoint Nuxt
+    const data = await $fetch<Category[]>('/api/subCategory') // ton endpoint Nuxt
     categories.value = data
   } catch (err: any) {
     console.error('Erreur API interne:', err)

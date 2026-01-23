@@ -51,7 +51,7 @@ const { data: post, pending } = await useFetch<Post | null>(
             <!-- Category Badge -->
             <div class="absolute top-6 left-6">
               <span class="inline-block px-4 py-2 bg-purple-600 text-white text-sm font-semibold rounded-full shadow-lg">
-                {{ post.category.name || 'Article' }}
+                {{ post.subCategory.name || 'Article' }}
               </span>
             </div>
           </div>
