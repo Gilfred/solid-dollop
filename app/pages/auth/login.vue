@@ -7,10 +7,7 @@ import { useToast } from '#imports'
 
 const toast = useToast()
 const loading = ref(false)
-
-const { loginWithGoogle, fetchSession } = useAuth()
-console.log('SESSION CLIENT 👉', fetchSession)
-
+const { loginWithGoogle, loginWithEmail, fetchSession, createUser } = useAuth()
 
 const schema = z.object({
   email: z.string().email('Email invalide'),
@@ -35,8 +32,10 @@ const providers = [
       loading.value = true
       try {
         await loginWithGoogle()
+        await fetchSession()
         toast.add({ title: '✓ Connecté avec Google', color: 'green' })
-      } catch (err) {
+        await navigateTo('/dashboard')
+      } catch {
         toast.add({ title: '✗ Erreur Google', color: 'red' })
       } finally {
         loading.value = false
@@ -54,14 +53,35 @@ const providers = [
 async function onSubmit(event: FormSubmitEvent<Schema>) {
   loading.value = true
   try {
-    await new Promise(resolve => setTimeout(resolve, 1200))
-    toast.add({ title: '✓ Connexion réussie', color: 'green' })
+    await loginWithEmail(
+      event.data.email,
+      event.data.password,
+      event.data.remember
+    )
+    console.log('Login successful', event.data) 
+   
+
+    await fetchSession()
+
+    toast.add({
+      title: '✓ Connexion réussie',
+      color: 'green'
+    })
+
+    await navigateTo('/admin')
+  } catch {
+    toast.add({
+      title: '✗ Email ou mot de passe incorrect',
+      color: 'red'
+    })
   } finally {
     loading.value = false
   }
 }
 
-onMounted(() => fetchSession())
+onMounted(() => {
+  fetchSession()
+})
 </script>
 
 <template>
@@ -201,6 +221,7 @@ onMounted(() => fetchSession())
             class="h-12 justify-center font-medium"
           >
             Continuer avec {{ provider.name }}
+          
           </UButton>
         </div>
 
@@ -210,6 +231,11 @@ onMounted(() => fetchSession())
           <NuxtLink to="/register" class="font-semibold text-purple-600 dark:text-indigo-400 hover:underline">
             Inscrivez-vous gratuitement
           </NuxtLink>
+
+          <UButton
+           @click="createUser"
+          > s'inscrit 
+        </UButton>
         </p>
 
         <!-- Footer -->

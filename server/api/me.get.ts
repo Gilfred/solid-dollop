@@ -1,15 +1,15 @@
-export default defineEventHandler(async (event) => {
-  const user = event.context.user;
+import { auth } from "../utils/auth";
 
-  if (!user) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: "Unauthorized",
-    });
-  }
+export default defineEventHandler(async (event) => {
+  const session = await auth.api.getSession({
+    headers: event.headers,
+
+    
+  });
+    console.log("Session récupérée dans me.get.ts :", session)
+  
 
   return {
-    user,
-    session: event.context.session,
+    user: session?.user || null,
   };
 });
