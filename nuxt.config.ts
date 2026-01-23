@@ -18,7 +18,7 @@ export default defineNuxtConfig({
      fonts: false,
   },
   router: {
-    middleware: ['auth.global']
+    middleware: 'auth.global'
   },
 
   // app était mal placé (manquait une virgule après ui)

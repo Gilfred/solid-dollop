@@ -1,6 +1,6 @@
 export interface Post {
   id: number
-  category: string
+  subCategory: string
   title: string
   slug: string
   tags: string[]

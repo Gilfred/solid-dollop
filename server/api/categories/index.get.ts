@@ -1,3 +1,6 @@
+
+import { prisma } from '../../utils/prisma'
+
 export default defineEventHandler(async () => {
   try {
     const categories = await prisma.category.findMany()

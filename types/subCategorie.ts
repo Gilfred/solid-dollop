@@ -1,4 +1,4 @@
-interface Category {
+interface subCategory {
   id: string
   name: string
   slug: string
@@ -10,4 +10,4 @@ interface Category {
   createdAt: string
   updatedAt: string
 }
-export type { Category }    
+export type { subCategory }
