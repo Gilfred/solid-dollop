@@ -1,48 +1,37 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  
-  // Configuration pour Vercel Nitro avec le stockage Blob
+
+  /**
+   * Configuration Nitro pour Vercel
+   */
   nitro: {
     preset: 'vercel',
-    
-    // Vous pouvez garder le stockage local pour le développement
+
+    /**
+     * Stockage persistant via Vercel Blob
+     * (remplace totalement fs en production)
+     */
     storage: {
-      'uploads': {
-        driver: 'fs',
-        base: './public/uploads'
+      uploads: {
+        driver: 'vercel-blob'
       },
-      'images': {
-        driver: 'fs',
-        base: './public/images'
+      images: {
+        driver: 'vercel-blob'
       }
-    },
-    
-    publicAssets: [
-      {
-        dir: './public/uploads',
-        baseURL: '/uploads'
-      },
-      {
-        dir: './public/images',
-        baseURL: '/images'
-      }
-    ]
-  },
-  
-  // Configuration runtime pour Vercel Blob
-  runtimeConfig: {
-    blobReadWriteToken: process.env.BLOB_READ_WRITE_TOKEN,
-  },
-  
-  routeRules: {
-    '/uploads/**': {
-      cors: true,
-      headers: {
-        'Cache-Control': 'public, max-age=31536000',
-        'Access-Control-Allow-Origin': '*'
-      },
-      cache: { maxAge: 60 * 60 * 24 * 365 }
     }
+  },
+
+  /**
+   * Variables runtime (OBLIGATOIRE pour Vercel Blob)
+   */
+  runtimeConfig: {
+    blobReadWriteToken: process.env.BLOB_READ_WRITE_TOKEN
   }
-});
+
+  /**
+   * Pas de publicAssets
+   * Pas de routeRules pour /uploads
+   * Les fichiers sont servis via URL Blob Vercel
+   */
+})
