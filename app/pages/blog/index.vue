@@ -77,21 +77,21 @@ onMounted(async () => {
         </div>
 
         <!-- Masonry Grid -->
-        <div v-else-if="posts.length > 0" class="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
+        <div v-else-if="posts.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 space-y-6">
           <article
             v-for="post in posts"
             :key="post.id"
             class="break-inside-avoid group"
           >
-            <NuxtLink :to="`/posts/${post.id}`">
-              <div class="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 border border-gray-200 dark:border-gray-800 hover:border-purple-300 dark:hover:border-indigo-700">
+            <NuxtLink :to="`/blog/${post.id}`">
+              <div class="h-max-[300px] bg-white dark:bg-gray-900 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 border border-gray-200 dark:border-gray-800 hover:border-purple-300 dark:hover:border-indigo-700">
                 
                 <!-- Image -->
                 <div class="relative overflow-hidden">
                   <NuxtImg
                     :src="post.image"
                     :alt="post.title"
-                    class="w-full h-auto group-hover:scale-110 transition-transform duration-700"
+                    class="w-full h-60 group-hover:scale-110 transition-transform duration-700"
                   />
                   <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   
@@ -100,13 +100,13 @@ onMounted(async () => {
                     <span 
                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold backdrop-blur-md shadow-lg"
                       :style="{ 
-                        backgroundColor: post.category?.color + '40',
+                        backgroundColor: post.sub_category_id?.color + '40',
                         color: 'white',
-                        border: `1px solid ${post.category?.color}60`
+                        border: `1px solid ${post.sub_category_id?.color}60`
                       }"
                     >
-                      <UIcon :name="post.category?.icon || 'i-heroicons-tag'" class="w-3 h-3" />
-                      {{ post.category?.name || 'Non catégorisé' }}
+                      <UIcon :name="post.sub_category_id?.icon || 'i-heroicons-tag'" class="w-3 h-3" />
+                      {{ post.sub_category_id?.name || 'Non catégorisé' }}
                     </span>
                   </div>
 
