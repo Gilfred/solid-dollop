@@ -1,7 +1,92 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from '@nuxt/ui'
+import type { DropdownMenuItem } from '@nuxt/ui'
+import { useAuth } from '../../../composables/useAuth'
+import { useToast } from '#imports'
+import { ref } from 'vue'
 
-const items: NavigationMenuItem[][] = [[{
+const toast = useToast()
+const { logout } = useAuth() // récupère la fonction de déconnexion
+
+const dropdownItems = ref<DropdownMenuItem[][]>([
+  [
+    {
+      label: 'Benjamin',
+      avatar: {
+        src: 'https://github.com/benjamincanac.png'
+      },
+      type: 'label'
+    }
+  ],
+  [
+    {
+      label: 'Profile',
+      icon: 'i-lucide-user'
+    },
+   
+    {
+      label: 'Settings',
+      icon: 'i-lucide-cog',
+      kbds: [',']
+    },
+   
+  ],
+  [
+    {
+      label: 'Team',
+      icon: 'i-lucide-users'
+    },
+    {
+      label: 'Invite users',
+      icon: 'i-lucide-user-plus',
+      children: [
+        [
+          {
+            label: 'Email',
+            icon: 'i-lucide-mail'
+          },
+          {
+            label: 'Message',
+            icon: 'i-lucide-message-square'
+          }
+        ],
+        [
+          {
+            label: 'More',
+            icon: 'i-lucide-circle-plus'
+          }
+        ]
+      ]
+    },
+   
+  ],
+  [
+    
+    {
+      label: 'Support',
+      icon: 'i-lucide-life-buoy',
+      to: '/docs/components/dropdown-menu'
+    },
+   
+  ],
+  [
+    {
+      label: 'Logout',
+      icon: 'i-lucide-log-out',
+      onClick: async () => {
+        try {
+          await logout() // déconnexion
+          toast.add({ title: '✓ Déconnecté', color: 'green' })
+          await navigateTo('/auth/login') // redirection vers la page login
+        } catch (err) {
+          toast.add({ title: '✗ Erreur lors de la déconnexion', color: 'red' })
+        }
+      }
+    }
+  ]
+])
+
+const navItems: NavigationMenuItem[][] = [[{
   label: 'Vue d\'ensemble',
   icon: 'i-heroicons-squares-2x2',
   to: '/admin',
@@ -84,7 +169,7 @@ const items: NavigationMenuItem[][] = [[{
       <div class="px-4 mt-2">
         <UNavigationMenu
           :collapsed="collapsed"
-          :items="items[0]"
+          :items="navItems[0]"
           orientation="vertical"
           :ui="{
             wrapper: 'space-y-1',
@@ -115,7 +200,7 @@ const items: NavigationMenuItem[][] = [[{
         <div v-if="!collapsed" class="h-px bg-gradient-to-r from-transparent via-purple-300 dark:via-purple-800 to-transparent mb-4" />
         <UNavigationMenu
           :collapsed="collapsed"
-          :items="items[1]"
+          :items="navItems[1]"
           orientation="vertical"
           :ui="{
             wrapper: 'space-y-1',
@@ -139,6 +224,7 @@ const items: NavigationMenuItem[][] = [[{
     </template>
 
     <template #footer="{ collapsed }">
+      <UDropdownMenu :items="dropdownItems">
       <div class="p-4 border-t border-purple-100 dark:border-purple-900/30 bg-gradient-to-t from-purple-50/50 to-transparent dark:from-purple-950/20">
         <UButton
           :avatar="{ src: 'https://github.com/benjamincanac.png' }"
@@ -150,10 +236,13 @@ const items: NavigationMenuItem[][] = [[{
           class="group !rounded-xl hover:!bg-purple-50 dark:hover:!bg-purple-950/40 !text-gray-700 dark:!text-gray-300 hover:!text-purple-700 dark:hover:!text-purple-300 transition-all duration-200"
         >
           <template v-if="!collapsed" #trailing>
+              
             <UIcon name="i-heroicons-chevron-up-down" class="w-4 h-4 !text-gray-400 group-hover:!text-purple-600 dark:group-hover:!text-purple-400 transition-colors" />
+           
           </template>
         </UButton>
       </div>
+       </UDropdownMenu>
     </template>
   </UDashboardSidebar>
 </template>
