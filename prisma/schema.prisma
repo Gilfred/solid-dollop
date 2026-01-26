@@ -77,6 +77,7 @@ model User {
 
   sessions      Session[]
   accounts      Account[]
+    @@map("users")
 }
 
 model Session {
@@ -88,6 +89,7 @@ model Session {
   expiresAt    DateTime
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
+    @@map("sessions")
 }
 
 model Account {
