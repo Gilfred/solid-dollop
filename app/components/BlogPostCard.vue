@@ -6,7 +6,7 @@
     >
       <!-- Image avec overlay -->
       <div class="relative group">
-        <img
+        <NuxtImg
           :src="post.image"
           :alt="post.title"
           class="rounded-lg mb-3 h-40 w-full object-cover transition duration-300 group-hover:grayscale"

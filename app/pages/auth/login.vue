@@ -7,14 +7,13 @@ import { useToast } from '#imports'
 
 const toast = useToast()
 const loading = ref(false)
-// <<<<<<< HEAD
-// const { loginWithGoogle, loginWithEmail, fetchSession, createUser } = useAuth()
-// =======
 
-const { loginWithGoogle, fetchSession } = useAuth()
+// const { loginWithGoogle, loginWithEmail, fetchSession, createUser } = useAuth()
+
+const { loginWithGoogle, loginWithEmail, createUser, fetchSession } = useAuth()
 console.log('SESSION CLIENT 👉', fetchSession)
 
->>>>>>> upstream/dev-zak
+
 
 const schema = z.object({
   email: z.string().email('Email invalide'),
@@ -39,72 +38,55 @@ const providers = [
       loading.value = true
       try {
         await loginWithGoogle()
-// <<<<<<< HEAD
-//         await fetchSession()
-//         toast.add({ title: '✓ Connecté avec Google', color: 'green' })
-//         await navigateTo('/dashboard')
-//       } catch {
-// =======
+
         toast.add({ title: '✓ Connecté avec Google', color: 'green' })
+
       } catch (err) {
-// >>>>>>> upstream/dev-zak
+
         toast.add({ title: '✗ Erreur Google', color: 'red' })
       } finally {
         loading.value = false
       }
     }
   },
-  {
-    name: 'GitHub',
-    icon: 'i-simple-icons-github',
-    color: '#181717',
-    onClick: () => toast.add({ title: 'Bientôt disponible' })
-  }
+ 
 ]
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
   loading.value = true
   try {
-// <<<<<<< HEAD
-//     await loginWithEmail(
-//       event.data.email,
-//       event.data.password,
-//       event.data.remember
-//     )
-//     console.log('Login successful', event.data) 
-   
+await loginWithEmail(
+    event.data.email,
+    event.data.password,
+    event.data.remember
+  )
+  console.log('Login successful', event.data) 
 
-//     await fetchSession()
+  await fetchSession()
+   toast.add({
+       title: '✓ Connexion réussie',
+       color: 'green'
+     })
+await navigateTo('/admin')
+  } catch {
+    toast.add({
+      title: '✗ Email ou mot de passe incorrect',
+      color: 'red'
+    })
 
-//     toast.add({
-//       title: '✓ Connexion réussie',
-//       color: 'green'
-//     })
-
-//     await navigateTo('/admin')
-//   } catch {
-//     toast.add({
-//       title: '✗ Email ou mot de passe incorrect',
-//       color: 'red'
-//     })
-// =======
     await new Promise(resolve => setTimeout(resolve, 1200))
     toast.add({ title: '✓ Connexion réussie', color: 'green' })
-// >>>>>>> upstream/dev-zak
+ onMounted(() => {
+   fetchSession()
+ })
+
+onMounted(() => fetchSession())
   } finally {
     loading.value = false
   }
 }
 
-// <<<<<<< HEAD
-// onMounted(() => {
-//   fetchSession()
-// })
-// =======
-onMounted(() => fetchSession())
-// >>>>>>> upstream/dev-zak
 </script>
-
 <template>
   <div class="min-h-screen grid md:grid-cols-2">
     
@@ -175,7 +157,7 @@ onMounted(() => fetchSession())
         </div>
 
         <!-- Form -->
-        <UForm :schema="schema" :state="state" @submit="onSubmit" class="space-y-5">
+        <UForm :schema="schema" :state="state" @submit="onSubmit" class="space-y-5 w-full">
           
           <div class="space-x-6">
           <UFormGroup label="Adresse email" name="email" required>

@@ -3,6 +3,17 @@ import AppHeader from '~/components/AppHeader.vue'
 import { ref, onMounted } from 'vue'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { navigateTo } from '#app'
+
+function goToLogin() {
+  navigateTo('/blog') // <-- chemin correct
+}
+function goToTendance() {
+  const section = document.getElementById('newsletter-form')
+  if (section) {
+    section.scrollIntoView({ behavior: 'smooth' })
+  }
+}
 
 // Carousel items images
 const items = [
@@ -87,7 +98,7 @@ onMounted(() => {
         autoplay        
         :autoplay-speed="3000"  
       >
-        <img :src="item" alt="Hero carousel" class="w-full h-full object-cover" />
+        <NuxtImg :src="item" alt="Hero carousel" class="w-full h-full object-cover" />
       </UCarousel>
 
       <!-- Overlay  -->
@@ -170,6 +181,7 @@ onMounted(() => {
           class="px-10 py-4 text-base font-semibold bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full"
           icon="i-heroicons-home-modern"
           trailing
+           @click="goToLogin"
         >
           Explorer les tendances
         </UButton>
@@ -179,6 +191,7 @@ onMounted(() => {
           class="px-10 py-4 bg-white text-gray-900 hover:bg-white/90 text-base font-semibold rounded-full"
           icon="i-heroicons-bookmark"
           trailing
+          @click="goToTendance"
         >
           S'abonner à la newsletter
         </UButton>

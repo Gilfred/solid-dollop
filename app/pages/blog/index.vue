@@ -83,12 +83,12 @@ onMounted(async () => {
             :key="post.id"
             class="break-inside-avoid group"
           >
-            <NuxtLink :to="`/posts/${post.slug}`">
+            <NuxtLink :to="`/posts/${post.id}`">
               <div class="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 border border-gray-200 dark:border-gray-800 hover:border-purple-300 dark:hover:border-indigo-700">
                 
                 <!-- Image -->
                 <div class="relative overflow-hidden">
-                  <img
+                  <NuxtImg
                     :src="post.image"
                     :alt="post.title"
                     class="w-full h-auto group-hover:scale-110 transition-transform duration-700"

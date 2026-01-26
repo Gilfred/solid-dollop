@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from '@nuxt/ui'
-
+import { navigateTo } from '#app'
 const route = useRoute()
 const isScrolled = ref(false)
 
@@ -12,6 +12,9 @@ if (process.client) {
     window.addEventListener('scroll', handleScroll)
     onUnmounted(() => window.removeEventListener('scroll', handleScroll))
   })
+}
+function goToLogin() {
+  navigateTo('/auth/login') // remplace /search par ta route cible
 }
 
 const items = computed<NavigationMenuItem[]>(() => [
@@ -85,6 +88,7 @@ const items = computed<NavigationMenuItem[]>(() => [
             size="lg"
             square
             class="hidden sm:flex"
+            
           />
           
           
@@ -92,7 +96,8 @@ const items = computed<NavigationMenuItem[]>(() => [
           <UButton
             color="primary"
             size="lg"
-            class="hidden lg:flex font-semibold rounded-full bg-gradient-to-r from-purple-600 to-indigo-600"
+            class="hidden lg:flex font-semibold rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:bg-purple-100/50 dark:hover:bg-indigo-900/30"
+            @click="goToLogin()"
           >
             S'abonner
           </UButton>
@@ -104,7 +109,7 @@ const items = computed<NavigationMenuItem[]>(() => [
             icon="i-heroicons-bars-3"
             size="lg"
             square
-            class="md:hidden"
+            class="md:hidden "
           />
         </div>
       </div>

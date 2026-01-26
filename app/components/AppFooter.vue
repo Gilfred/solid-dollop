@@ -101,7 +101,7 @@ const handleSubscribe = async () => {
         </div>
 
         <!-- Newsletter -->
-        <div class="bg-white bg-opacity-5 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
+        <div id="newsletter-form" class="bg-white bg-opacity-5 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
           <div class="flex items-center gap-2 mb-4">
             <UIcon name="i-heroicons-envelope" class="w-6 h-6 text-purple-400" />
             <h3 class="text-xl font-bold">Newsletter Exclusive</h3>

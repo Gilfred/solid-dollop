@@ -83,7 +83,7 @@ const prevSlide = () => {
                   <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
                   <NuxtLink :to="`/blog/${post.id}`" class="absolute bottom-0 left-0 right-0 p-8 text-white">
                     <span class="inline-block px-3 py-1 bg-purple-500 rounded-full text-xs font-semibold mb-3">
-                      {{ post.category?.name || 'Article' }}
+                      {{ post.sub_category_id?.name || 'Article' }}
                     </span>
                     <h3 class="text-3xl font-bold mb-2">{{ post.title }}</h3>
                     <div class="flex items-center gap-2 text-sm opacity-90">
@@ -125,7 +125,7 @@ const prevSlide = () => {
 
           <!-- Section Autres Articles -->
           <div>
-            <h2 class="text-2xl font-bold mb-6 text-gray-800 underline">Tous nos articles</h2>
+            <h2 class="text-2xl font-bold mb-6 text-gray-800 underline">Les actualités d'hier</h2>
             <div class="grid sm:grid-cols-2 gap-6">
               <NuxtLink
                 v-for="post in regularPosts"
@@ -140,7 +140,7 @@ const prevSlide = () => {
                     class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   />
                   <span class="absolute top-3 left-3 px-3 py-1 bg-black/70 backdrop-blur-sm text-white text-xs rounded-full">
-                    {{ post.subCategory?.name || 'Article' }}
+                    {{ post.sub_category_id?.name || 'Article' }}
                   </span>
                 </div>
                 <div class="p-5">
@@ -212,21 +212,21 @@ const prevSlide = () => {
           </div>
 
           <!-- Newsletter -->
-          <div class="bg-gradient-to-br from-purple-600 to-indigo-600 rounded-2xl shadow-lg p-6 text-white  border border-gray-500">
+          <div  class="bg-gradient-to-br from-purple-600 to-indigo-600 rounded-2xl shadow-lg p-6 text-white  border border-gray-500">
             <div class="flex items-center gap-2 mb-4">
               <UIcon name="i-heroicons-envelope" class="w-6 h-6" />
               <h3 class="text-xl font-bold underline">Newsletter</h3>
             </div>
-            <p class="text-sm mb-4 opacity-90">
+            <p class="text-sm mb-4 opacity-90 ">
               Recevez nos meilleures inspirations déco chaque semaine
             </p>
             <UInput
               type="email"
               placeholder="Votre email"
-              class="mb-3"
+              class="mb-3 w-full "
               size="lg"
             />
-            <UButton color="neutral" variant="solid" class="w-full" size="lg">
+            <UButton color="neutral" variant="solid" class="w-full  " size="lg">
               S'abonner
             </UButton>
           </div>

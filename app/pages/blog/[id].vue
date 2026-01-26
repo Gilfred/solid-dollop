@@ -15,7 +15,7 @@ const { data: post, pending } = await useFetch<Post | null>(
   <div class="relative min-h-screen bg-slate-50">
     <!-- Background Hero avec parallax effect -->
     <div v-if="post" class="hero-bg fixed top-0 left-0 right-0 z-0">
-      <img
+      <NuxtImg
         :src="post.image"
         :alt="post.title"
         class="w-full h-full object-cover"
@@ -41,7 +41,7 @@ const { data: post, pending } = await useFetch<Post | null>(
         <!-- Header Article avec image principale -->
         <div class="bg-white/95 backdrop-blur-sm rounded-2xl overflow-hidden shadow-2xl border border-gray-100">
           <div class="relative h-96 overflow-hidden">
-            <img
+            <NuxtImg
               :src="post.image"
               :alt="post.title"
               class="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
@@ -51,7 +51,7 @@ const { data: post, pending } = await useFetch<Post | null>(
             <!-- Category Badge -->
             <div class="absolute top-6 left-6">
               <span class="inline-block px-4 py-2 bg-purple-600 text-white text-sm font-semibold rounded-full shadow-lg">
-                {{ post.subCategory.name || 'Article' }}
+                {{ post.sub_category_id?.name || 'Article' }}
               </span>
             </div>
           </div>
@@ -159,7 +159,7 @@ const { data: post, pending } = await useFetch<Post | null>(
             <!-- Ces articles pourraient venir d'une requête API -->
             <div v-for="i in 3" :key="i" class="group cursor-pointer">
               <div class="relative h-40 rounded-lg overflow-hidden mb-3">
-                <img
+                <NuxtImg
                   :src="`https://images.unsplash.com/photo-${1600210000000 + i * 1000}?w=400`"
                   alt="Article similaire"
                   class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"

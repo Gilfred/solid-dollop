@@ -1,7 +1,7 @@
 export interface Post {
   id: number
-  subCategory: string
-  title: string
+  sub_category_id: number 
+   title: string
   slug: string
   tags: string[]
   excerpt: string
@@ -12,3 +12,4 @@ export interface Post {
   author?: string
   created_at: string
 }
+

@@ -3,9 +3,11 @@ import { createAuthClient } from "better-auth/client";
 export const useAuth = () => {
   const authClient = createAuthClient({
     baseURL: "http://localhost:3000",
+
     fetchOptions: {
       credentials: "include", // indispensable pour les cookies
     },
+
   });
 
   const session = useState<any | null>("session", () => null);
@@ -14,6 +16,10 @@ export const useAuth = () => {
     await authClient.signIn.social({
       provider: "google",
     });
+  };
+  
+  const loginWithGithub = async () => {
+    await authClient.signIn.social({ provider: "github" });
   };
 
   async function createUser() {
@@ -68,32 +74,9 @@ export const useAuth = () => {
 
       session.value = res.user || null;
     } catch (error) {
-// =======
-//     fetchOptions: { credentials: "include" }, // obligatoire
-//   });
-
-//   const session = useState("session", () => null);
-
-//   const loginWithGoogle = async () => {
-//     await authClient.signIn.social({ provider: "google" });
-//   };
-
-//   const logout = async () => {
-//     await authClient.signOut();
-//     session.value = null;
-//   };
-
-//   const fetchSession = async () => {
-//     try {
-//       const res = await $fetch("/api/me", { credentials: "include" });
-//       session.value = res.user || null;
-//     } catch (e) {
-//       console.error("SESSION CLIENT ❌", e);
-// >>>>>>> upstream/dev-zak
       session.value = null;
     }
   };
-
 
   return {
     session,
@@ -104,5 +87,6 @@ export const useAuth = () => {
     createUser,
   };
   return { session, loginWithGoogle, logout, fetchSession };
+
 
 };

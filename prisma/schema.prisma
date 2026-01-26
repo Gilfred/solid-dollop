@@ -32,7 +32,6 @@ model SubCategory {
   icon        String
   color       String
 
-
   // Relations
   categoryId Int
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)

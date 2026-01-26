@@ -1,5 +1,7 @@
 import { defineEventHandler, readMultipartFormData, setResponseStatus } from 'h3';
 import { prisma } from '../../utils/prisma';
+import cloudinary from '../../utils/cloudinary'
+
 
 export default defineEventHandler(async (event) => {
   try {
@@ -77,8 +79,7 @@ export default defineEventHandler(async (event) => {
 
     // Gestion de l'upload de l'image
     
-    // 1. Créer une instance du stockage configuré pour 'uploads'
-    const storage = useStorage('uploads');
+    
     
     // 2. Générer un nom de fichier sécurisé et unique
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -115,11 +116,17 @@ export default defineEventHandler(async (event) => {
     // 3. Chemin de stockage (relatif au stockage 'uploads')
     const storagePath = newFilename;
     
-    // 4. Sauvegarder le fichier
-    await storage.setItem(storagePath, imageFile.data);
-    
-    // 5. URL pour accéder au fichier (correspond à la config publicAssets)
-    const imageUrl = `/uploads/${newFilename}`;
+    // Upload vers Cloudinary
+        const uploadResult = await cloudinary.uploader.upload(
+          `data:${imageFile.type};base64,${imageFile.data.toString('base64')}`,
+          {
+            folder: 'blog_posts',
+            public_id: `post-${uniqueSuffix}-${safeFilename}`,
+          }
+        )
+
+        const imageUrl = uploadResult.secure_url
+
 
     // Vérifier si le slug existe déjà
     const existingPost = await prisma.post.findUnique({

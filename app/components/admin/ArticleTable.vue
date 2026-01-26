@@ -75,11 +75,14 @@ async function deleteArticle(id: number) {
 }
 
 // Fonction pour modifier un article
-// Dans ton script setup
-const emit = defineEmits(['edit-article'])
+// ✅ Variables pour contrôler le modal et l'article à éditer
+const isModalOpen = ref(false)         // pour ouvrir/fermer le modal
+const articleToEdit = ref<Post | null>(null) // pour passer l'article à éditer
 
-async function editArticle(article: Article) {
-  emit('edit-article', article) // <-- au lieu de window.location.href
+// Exemple de fonction pour ouvrir le modal en mode édition
+const editArticle = (article: Post) => {
+  articleToEdit.value = article
+  isModalOpen.value = true
 }
 
 
@@ -165,7 +168,10 @@ const columns: TableColumn<Article>[] = [
         square: true,
         size: 'sm',
         class: '!text-purple-600 dark:!text-indigo-400 hover:!bg-purple-100/50 dark:hover:!bg-indigo-900/30',
-        onClick: () => editArticle(article)
+        onClick: () => {
+          articleToEdit.value = article
+          isModalOpen.value = true
+}
       }),
       h(UButton, { 
         icon: 'i-heroicons-trash',
@@ -274,6 +280,7 @@ const stats = computed(() => [
               variant="ghost"
               color="gray"
               square
+              
               class="!text-purple-600 dark:!text-indigo-400 hover:!bg-purple-100/50 dark:hover:!bg-indigo-900/30"
             />
              <UButton

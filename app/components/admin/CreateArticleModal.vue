@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue'
+import { watch } from 'vue'
+
 
 // Simule la récupération de l'utilisateur connecté
 const currentUser = 'Zaki AGOKOLI'
@@ -7,9 +9,19 @@ const currentUser = 'Zaki AGOKOLI'
 // Ouverture du modal
 const isOpen = ref(false)
 
+interface Category {
+  id: number
+  value: string
+  label: string
+  icon: string
+}
+const categories = ref<Category[]>([])
+
+
 // Formulaire réactif
 interface Post {
   category: string
+  sub_category_id: number | null
   title: string
   content: string
   description: string
@@ -19,7 +31,8 @@ interface Post {
 
 const form = reactive<Post>({
   category: '',
-  title: '',
+ sub_category_id: null,
+   title: '',
   content: '',
   description: '',
   images: [],
@@ -27,7 +40,6 @@ const form = reactive<Post>({
 })
 
 // Liste des catégories avec icônes
-const categories = ref<{ value: string; label: string; icon: string }[]>([])
 const loadingCategories = ref(true)
 onMounted(async () => {
   try {
@@ -35,11 +47,13 @@ onMounted(async () => {
     if (!res.ok) throw new Error('Erreur API catégories')
     const data = await res.json()
     // Exemple : data = [{ id: 1, name: "Tech", icon: "i-heroicons-cpu-chip" }, ...]
-    categories.value = data.map(cat => ({
-      value: cat.name,   // ou cat.id si tu veux l’ID
-      label: cat.name,
-      icon: cat.icon || 'i-heroicons-collection'
-    }))
+   categories.value = data.map(cat => ({
+  id: cat.id,       // <- Ajout de l'id
+  value: cat.name,
+  label: cat.name,
+  icon: cat.icon || 'i-heroicons-collection'
+}))
+
   } catch (err) {
     console.error(err)
     categories.value = []
@@ -75,6 +89,34 @@ const generateUniqueSlug = async (title: string) => {
   return slug
 }
 
+const props = defineProps<{
+  postToEdit?: {
+    id: number
+    category: string
+    title: string
+    content: string
+    description: string
+    images?: string[] // URL des images existantes
+    author?: string
+  }
+}>()
+
+
+watch(() => props.postToEdit, (newPost) => {
+  if (newPost) {
+    form.category = newPost.category
+    form.title = newPost.title
+    form.description = newPost.description
+    form.content = newPost.content
+    form.author = newPost.author || ''
+    // Pour les images existantes, tu peux créer un tableau supplémentaire
+    // exemple : form.existingImages = newPost.images || []
+  } else {
+    Object.assign(form, { category: '', title: '', description: '', content: '', images: [], author: '' })
+  }
+}, { immediate: true })
+
+
 
 
 // Soumission
@@ -93,7 +135,13 @@ const submit = async () => {
   formData.append('author', form.author || '')
   formData.append('slug', await generateUniqueSlug(form.title)) // ✅ await ici
   formData.append('image', form.images[0])
-  formData.append('sub_category_id', form.category) // si c’est un id numérique
+  formData.append('sub_category_id', String(form.sub_category_id))
+
+
+formData.append(
+  'sub_category_id',
+  String(form.sub_category_id)
+)
 
   try {
     const response = await fetch('/api/posts', {
@@ -126,6 +174,8 @@ const submit = async () => {
     alert(err.message)
   }
 }
+const titleMaxLength = 100
+const descriptionMaxLength = 250
 
 
 </script>
@@ -190,7 +240,8 @@ const submit = async () => {
             <button
                v-for="cat in categories"
                 :key="cat.value"
-                @click="form.category = cat.value"
+              
+                @click="form.sub_category_id = cat.id; form.category = cat.value"
               :class="[
                 'group relative flex items-center gap-2 px-4 py-3 rounded-xl border-2 transition-all duration-200',
                 form.category === cat.value

@@ -3,7 +3,7 @@
   <section class="hero-wrapper relative">
     <!-- Image de background -->
     <div class="hero-bg absolute inset-0 z-0">
-      <img 
+      <NuxtImg 
         src="/images/fond-hero.jpg" 
         alt="Hero background" 
         class="w-full h-full object-cover"
