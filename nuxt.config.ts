@@ -2,21 +2,21 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  
+
 
   modules: ['@nuxt/ui', '@nuxt/image'],
-  
+
   css: ['./app/assets/css/main.css'],
-  
+
   components: [
     {
       path: '~/components',
       pathPrefix: false,
     },
   ],
-  
+
   ui: {
-     fonts: false,
+    fonts: false,
   },
   router: {
     middleware: 'auth.global'
@@ -30,19 +30,19 @@ export default defineNuxtConfig({
           rel: 'stylesheet',
           href: 'https://fonts.googleapis.com/css2?family=Gravitas+One&display=swap'
         },
-         {
+        {
           rel: 'stylesheet',
           href: 'https://fonts.googleapis.com/css2?family=Cookie&display=swap'
         },
-         {
+        {
           rel: 'stylesheet',
           href: 'https://fonts.googleapis.com/css2?family=Nova+Square&display=swap'
         }
       ]
     }
   },
- 
-  
+
+
 
   // Configuration du stockage pour les uploads
   nitro: {
@@ -57,7 +57,7 @@ export default defineNuxtConfig({
         base: './public/images'
       }
     },
-    
+
     // Configuration pour servir les fichiers statiques
     publicAssets: [
       {
@@ -69,12 +69,12 @@ export default defineNuxtConfig({
         baseURL: '/images'
       }
     ],
-     preset: 'vercel',
-    externals: {
-      inline: ['@prisma/client', '.prisma/client']
-    }
+    preset: 'vercel',
+    // externals: {
+    //   inline: ['@prisma/client', '.prisma/client']
+    // }
   },
-  
+
   // Règles de routage pour les fichiers uploadés
   routeRules: {
     '/uploads/**': {
@@ -92,5 +92,12 @@ export default defineNuxtConfig({
         'Access-Control-Allow-Origin': '*'
       }
     }
-  }
+  },
+  // vite: {
+  //   resolve: {
+  //     alias: {
+  //       './prisma/client/index-browser': './node_modules/.prisma/client/index-browser.js',
+  //     },
+  //   },
+  // },
 });

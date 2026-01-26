@@ -232,7 +232,7 @@ onMounted(() => fetchSession())
         <!-- Sign Up -->
         <p class="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">
           Pas de compte ?
-          <NuxtLink to="/register" class="font-semibold text-purple-600 dark:text-indigo-400 hover:underline">
+          <NuxtLink to="/auth/singup"  class="font-semibold text-purple-600 dark:text-indigo-400 hover:underline">
             Inscrivez-vous gratuitement
           </NuxtLink>
 

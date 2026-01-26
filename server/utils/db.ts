@@ -1,6 +1,5 @@
 // server/utils/db.ts
-import pkg from '@prisma/client'
-const { PrismaClient } = pkg
+import { PrismaClient } from '@@/prisma/generated/prisma-client';
 
 // Singleton global pour éviter les multiples instances en serverless
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient }
