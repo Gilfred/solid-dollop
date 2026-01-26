@@ -25,8 +25,8 @@ export const useAuth = () => {
   async function createUser() {
     try {
       const result = await authClient.signUp.email({
-        name: "Fred1",
-        email: "zred1@gmail.com",
+        name: "Fred",
+        email: "zred@gmail.com",
         password: "password123"
       });
 
