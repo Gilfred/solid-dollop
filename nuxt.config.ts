@@ -41,7 +41,7 @@ export default defineNuxtConfig({
       ]
     }
   },
-  
+ 
   
 
   // Configuration du stockage pour les uploads
@@ -68,7 +68,11 @@ export default defineNuxtConfig({
         dir: './public/images',
         baseURL: '/images'
       }
-    ]
+    ],
+     preset: 'vercel',
+    externals: {
+      inline: ['@prisma/client', '.prisma/client']
+    }
   },
   
   // Règles de routage pour les fichiers uploadés
