@@ -1,3 +1,4 @@
+
 import { defineEventHandler, setResponseStatus } from 'h3';
 import { prisma } from '../../utils/prisma';
 
@@ -35,6 +36,7 @@ export default defineEventHandler(async (event) => {
 
     // Si aucun article n'est trouvé, retourner une erreur 404
     if (!post) {
+
       setResponseStatus(event, 404); // Code 404  Not Found
       return { error: 'Article non trouvé.' };
     }

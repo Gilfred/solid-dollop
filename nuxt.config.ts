@@ -1,37 +1,103 @@
+// nuxt.config.ts
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
 
-  /**
-   * Configuration Nitro pour Vercel
-   */
-  nitro: {
-    preset: 'vercel',
 
-    /**
-     * Stockage persistant via Vercel Blob
-     * (remplace totalement fs en production)
-     */
-    storage: {
-      uploads: {
-        driver: 'vercel-blob'
-      },
-      images: {
-        driver: 'vercel-blob'
-      }
+  modules: ['@nuxt/ui', '@nuxt/image'],
+
+  css: ['./app/assets/css/main.css'],
+
+  components: [
+    {
+      path: '~/components',
+      pathPrefix: false,
+    },
+  ],
+
+  ui: {
+    fonts: false,
+  },
+  router: {
+    middleware: 'auth.global'
+  },
+
+  // app était mal placé (manquait une virgule après ui)
+  app: {
+    head: {
+      link: [
+        {
+          rel: 'stylesheet',
+          href: 'https://fonts.googleapis.com/css2?family=Gravitas+One&display=swap'
+        },
+        {
+          rel: 'stylesheet',
+          href: 'https://fonts.googleapis.com/css2?family=Cookie&display=swap'
+        },
+        {
+          rel: 'stylesheet',
+          href: 'https://fonts.googleapis.com/css2?family=Nova+Square&display=swap'
+        }
+      ]
     }
   },
 
-  /**
-   * Variables runtime (OBLIGATOIRE pour Vercel Blob)
-   */
-  runtimeConfig: {
-    blobReadWriteToken: process.env.BLOB_READ_WRITE_TOKEN
-  }
 
-  /**
-   * Pas de publicAssets
-   * Pas de routeRules pour /uploads
-   * Les fichiers sont servis via URL Blob Vercel
-   */
-})
+
+  // Configuration du stockage pour les uploads
+  nitro: {
+    // Configuration du stockage persistant
+    storage: {
+      'uploads': {
+        driver: 'fs',
+        base: './public/uploads'
+      },
+      'images': {
+        driver: 'fs',
+        base: './public/images'
+      }
+    },
+
+    // Configuration pour servir les fichiers statiques
+    publicAssets: [
+      {
+        dir: './public/uploads',
+        baseURL: '/uploads'
+      },
+      {
+        dir: './public/images',
+        baseURL: '/images'
+      }
+    ],
+    preset: 'vercel',
+    // externals: {
+    //   inline: ['@prisma/client', '.prisma/client']
+    // }
+  },
+
+  // Règles de routage pour les fichiers uploadés
+  routeRules: {
+    '/uploads/**': {
+      cors: true,
+      headers: {
+        'Cache-Control': 'public, max-age=31536000',
+        'Access-Control-Allow-Origin': '*'
+      },
+      cache: { maxAge: 60 * 60 * 24 * 365 }
+    },
+    '/images/**': {
+      cors: true,
+      headers: {
+        'Cache-Control': 'public, max-age=31536000',
+        'Access-Control-Allow-Origin': '*'
+      }
+    }
+  },
+  // vite: {
+  //   resolve: {
+  //     alias: {
+  //       './prisma/client/index-browser': './node_modules/.prisma/client/index-browser.js',
+  //     },
+  //   },
+  // },
+});

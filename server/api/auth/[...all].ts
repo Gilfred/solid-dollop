@@ -1,5 +1,9 @@
-import { auth } from "~~/server/utils/auth";
+// server/api/auth/[...].ts
+import { auth } from "../../utils/auth";
 
-export default defineEventHandler((event) => {
+export default defineEventHandler( (event) => {
+  // Utilisez l'API handler de Better Auth directement
   return auth.handler(toWebRequest(event));
+
 });
+

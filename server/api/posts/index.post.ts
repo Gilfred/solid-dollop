@@ -1,5 +1,7 @@
 import { defineEventHandler, readMultipartFormData, setResponseStatus } from 'h3';
 import { prisma } from '../../utils/prisma';
+import cloudinary from '../../utils/cloudinary'
+
 
 export default defineEventHandler(async (event) => {
   try {
@@ -75,14 +77,19 @@ export default defineEventHandler(async (event) => {
       };
     }
 
-    // === Gestion de l'upload de l'image ===
-    // Générer un nom de fichier unique
+    // Gestion de l'upload de l'image
+    
+    
+    
+    // 2. Générer un nom de fichier sécurisé et unique
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     const originalName = imageFile.filename;
     
-    let extension = '.jpg';
+    // Extraire l'extension du fichier
+    let extension = '.jpg'; // extension par défaut
     if (originalName.includes('.')) {
       const ext = originalName.substring(originalName.lastIndexOf('.')).toLowerCase();
+      // Valider que l'extension correspond au type MIME
       const mimeToExt: Record<string, string> = {
         'image/jpeg': '.jpg',
         'image/jpg': '.jpg',
@@ -93,6 +100,8 @@ export default defineEventHandler(async (event) => {
       extension = mimeToExt[imageFile.type?.toLowerCase() || ''] || ext;
     }
     
+
+    // Nettoyer le nom de fichier
     const baseName = originalName.includes('.') 
       ? originalName.substring(0, originalName.lastIndexOf('.'))
       : originalName;
@@ -101,47 +110,22 @@ export default defineEventHandler(async (event) => {
       .replace(/[^a-zA-Z0-9]/g, '-')
       .replace(/-+/g, '-')
       .toLowerCase();
+    // Nom de fichier final
+    const newFilename = `post-${uniqueSuffix}-${safeFilename}${extension}`;
     
-    const newFilename = `posts/${uniqueSuffix}-${safeFilename}${extension}`;
-    let imageUrl: string;
-    let storageMethod: 'vercel-blob' | 'local' = 'local';
+    // 3. Chemin de stockage (relatif au stockage 'uploads')
+    const storagePath = newFilename;
     
-    // Vérifier le token Blob
-    const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
-    
-    // Détecter si c'est un token de test/masqué
-    const isTestToken = !blobToken || blobToken.includes('******') || blobToken.length < 30;
-    
-    if (isTestToken) {
-      storageMethod = 'local';
-    } else {
-      try {
-        const { put } = await import('@vercel/blob');
-        const blob = await put(newFilename, imageFile.data, {
-          access: 'public',
-        });
-        
-        imageUrl = blob.url;
-        storageMethod = 'vercel-blob';
-      } catch (blobError: any) {
-        storageMethod = 'local';
-      }
-    }
-    
-    // Fallback au stockage local si Vercel Blob échoue
-    if (storageMethod === 'local') {
-      const fs = await import('fs/promises');
-      const path = await import('path');
-      
-      const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-      await fs.mkdir(uploadsDir, { recursive: true });
-      
-      const filePath = path.join(uploadsDir, newFilename.replace('posts/', ''));
-      await fs.writeFile(filePath, imageFile.data);
-      
-      imageUrl = `/uploads/${newFilename.replace('posts/', '')}`;
-    }
+    // Upload vers Cloudinary
+        const uploadResult = await cloudinary.uploader.upload(
+          `data:${imageFile.type};base64,${imageFile.data.toString('base64')}`,
+          {
+            folder: 'blog_posts',
+            public_id: `post-${uniqueSuffix}-${safeFilename}`,
+          }
+        )
 
+        const imageUrl = uploadResult.secure_url
     // Vérifier si le slug existe déjà
     const existingPost = await prisma.post.findUnique({
       where: { slug }
@@ -178,14 +162,14 @@ export default defineEventHandler(async (event) => {
     return {
       success: true,
       message: 'Article créé avec succès',
-      data: newPost,
-      storage: storageMethod
+      data: newPost
     };
 
   } catch (error) {
     console.error('Erreur lors de la création de l\'article:', error);
 
     if (error instanceof Error) {
+      // Gestion des erreurs Prisma
       if ('code' in error) {
         switch (error.code) {
           case 'P2002':

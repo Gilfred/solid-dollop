@@ -16,6 +16,7 @@ export default defineEventHandler(async (event) => {
         createdAt: 'desc',
       },
     });
+    
 
     // Retourner les posts sans la valeur du champ content
     return posts.map((post: any) => {

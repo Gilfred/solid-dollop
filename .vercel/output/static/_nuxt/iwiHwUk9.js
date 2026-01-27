@@ -1,0 +1,1 @@
+import{_ as n,a as _}from"./BMynh6-i.js";import{E as a,c as r,b as e,F as c,o as m}from"./D8WPD_cF.js";import"./B5DKgVER.js";import"./DF1CNUP1.js";import"./CqXz7m8x.js";const b=a({__name:"articles",setup(p){return(s,l)=>{const t=n,o=_;return m(),r(c,null,[e(t),e(o)],64)}}});export{b as default};

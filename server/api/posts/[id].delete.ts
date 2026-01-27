@@ -1,4 +1,3 @@
-
 import { defineEventHandler, setResponseStatus } from 'h3';
 import { unlink } from 'fs/promises';
 import { resolve } from 'path';
@@ -62,4 +61,3 @@ export default defineEventHandler(async (event) => {
     };
   }
 });
-

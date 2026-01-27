@@ -1,27 +1,14 @@
-# Nuxt dev/build outputs
-.output
-.data
+# Nuxt
 .nuxt
-.nitro
-.cache
+.output
 dist
 
-# Node dependencies
+# Node
 node_modules
 
-# Logs
-logs
-*.log
-
-# Misc
-.DS_Store
-.fleet
-.idea
-
-# Local env files
+# Env
 .env
 .env.*
-!.env.example
 
-/app/generated/prisma
-
+# Prisma
+prisma/dev.db

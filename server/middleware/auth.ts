@@ -1,21 +1,23 @@
 import { auth } from "~~/server/utils/auth";
+import { sendRedirect } from "h3";
 
 export default defineEventHandler(async (event) => {
-  // Skip auth check for Better Auth's own routes
-  if (event.path.startsWith("/api/auth")) {
-    return;
+  // Ne pas intercepter les routes Better Auth
+  if (event.path.startsWith("/api/auth")) return;
+
+  // Seules les pages protégées
+  const protectedPaths = ["/admin", "/user"];
+  if (!protectedPaths.some(p => event.path.startsWith(p))) return;
+
+  const session = await auth.api.getSession({ headers: event.node.req.headers });
+  console.log("Session récupérée côté serveur :", session);
+
+  if (!session?.user) {
+    // Redirection côté serveur vers la page de login
+    return sendRedirect(event, '/auth/login', 302);
   }
 
-  const session = await auth.api.getSession({
-    headers: event.headers,
-  });
-
-  if (!session) {
-    event.context.session = null;
-    event.context.user = null;
-    return;
-  }
-
-  event.context.session = session.session;
+  // Sinon on attache l'utilisateur au contexte
+  event.context.session = session;
   event.context.user = session.user;
 });
